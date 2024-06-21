@@ -1,0 +1,6 @@
+_target_: routefinder.models.baselines.mvmoe.MVMoE
+
+preset: all # for feature selection
+
+policy:
+  _target_: routefinder.models.baselines.mvmoe.policy.MVMoEPolicy

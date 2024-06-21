@@ -1,0 +1,9 @@
+_target_: routefinder.envs.mtvrp.MTVRPEnv
+name: mtvrp
+
+check_solution: False # for faster training
+
+generator_params:
+  num_loc: 20
+  variant_preset: "all"
+

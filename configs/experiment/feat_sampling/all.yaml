@@ -1,0 +1,22 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - rfbase-100.yaml
+  - _self_
+
+model:
+  _target_: routefinder.models.model.RouteFinderSingleVariantSampling
+  preset: "all"
+
+env:
+  generator_params:
+    subsample: False
+
+# Logging: we use Wandb in this case
+logger:
+  wandb:
+    project: "routefinder"
+    tags: ["rf", "${env.name}"]
+    group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
+    name: "rf-${env.generator_params.variant_preset}-single_feat_sampling"

@@ -1,0 +1,31 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - rfbase-50.yaml
+  - _self_
+
+env:
+  generator_params:
+    variant_preset: "all"
+
+model:
+  _target_: routefinder.models.model.RouteFinderBase
+  policy:
+    _target_: routefinder.models.policy.RouteFinderPolicy
+
+# Logging: we use Wandb in this case
+logger:
+  wandb:
+    project: "routefinder"
+    tags: ["rf", "${env.name}"]
+    group: "${env.generator_params.num_loc}-${env.name}"
+    name: "rf-${env.generator_params.variant_preset}"
+
+# Easier default under logs/ directory
+callbacks:
+  model_checkpoint:
+    dirpath: logs/${logger.wandb.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}/checkpoints
+    monitor: "val/reward/cvrp100"
+
+

@@ -1,0 +1,105 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "routefinder"
+version = "0.1.0"
+description = "Towards Foundation Models for Vehicle Routing Problems"
+authors = ["Your Name <your.email@example.com>"]  # replace with your actual name and email
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+rl4co = { git = "git@github.com:ai4co/rl4co.git", branch = "main" }
+pyvrp = { version = "^0.8.2", optional = true }
+ortools = { version = "^9.10.4067", optional = true }
+# lkh = { git = "git@github.com:leonlan/pylkh.git", rev = "7ba9965", optional = true}
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+black = "^23.3.0"
+ruff = "^0.1.6"
+pre-commit = "^3.3.3"
+
+[tool.poetry.extras]
+graph = ["torch_geometric"]
+testing = ["pytest", "pytest-cov"]
+solvers = ["pyvrp", "ortools"]
+
+
+# Ruff + Black + isort combo for code formatting
+# Adapted from https://github.com/AntonOsika/gpt-engineer (kudos!)
+# https://beta.ruff.rs/docs/configuration/#using-pyprojecttoml
+[tool.ruff]
+select = ["F", "E", "W", "I001"]
+line-length = 90
+show-fixes = false
+target-version = "py311"
+task-tags = ["TODO", "FIXME"]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+ignore = ["E501"] # never enforce `E501` (line length violations), done in Black
+
+# Ignore `E402` (import violations) and "F401" (unused imports) in all `__init__.py` files
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["E402", "F401"]
+
+[tool.ruff.isort]
+known-first-party = []
+known-third-party = []
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+combine-as-imports = true
+split-on-trailing-comma = false
+lines-between-types = 1
+
+# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html
+[tool.black]
+line-length = 90
+target-version = ["py311"]
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.direnv
+    | \.eggs
+    | \.git
+    | \.tox
+    | \.venv
+    | _build
+    | build
+    | dist
+    | venv
+  )/
+)
+'''
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    # Lines to exclude from coverage report (e.g., comments, debug statements)
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]

@@ -1,0 +1,41 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - rfbase-50.yaml
+  - _self_
+
+env:
+  generator_params:
+    variant_preset: "all"
+
+model:
+  _target_: routefinder.models.model.RouteFinderBase
+  policy:
+    _target_: rl4co.models.zoo.am.AttentionModelPolicy
+    embed_dim: 128
+    normalization: "instance"
+    use_graph_context: False
+    num_encoder_layers: 6
+    init_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.MTVRPInitEmbedding
+      embed_dim: ${model.policy.embed_dim}
+    context_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.MTVRPContextEmbedding
+      embed_dim: ${model.policy.embed_dim}
+
+# Logging: we use Wandb in this case
+logger:
+  wandb:
+    project: "routefinder-ablations"
+    tags: ["rf", "${env.name}", "ablations"]
+    group: "${env.generator_params.num_loc}-${env.name}"
+    name: "rf-ablation-no-globfeat-${env.generator_params.num_loc}"
+
+# Easier default under logs/ directory
+callbacks:
+  model_checkpoint:
+    dirpath: logs/${logger.wandb.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}/checkpoints
+    monitor: "val/reward/cvrp100"
+
+
