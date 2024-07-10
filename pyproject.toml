@@ -6,8 +6,18 @@ build-backend = "poetry.core.masonry.api"
 name = "routefinder"
 version = "0.1.0"
 description = "Towards Foundation Models for Vehicle Routing Problems"
-authors = ["Your Name <your.email@example.com>"]  # replace with your actual name and email
+authors = [
+    "Federico Berto <berto.federico2@gmail.com>",
+    "Chuanbo Hua <cbhua@kaist.ac.kr>",
+    "Nayeli Gast Zepeda <nayeli.gast@uni-bielefeld.de>",
+    "Andre Hottung",
+    "Leon Lan",
+    "Niels Wouda",
+    "Kevin Tierney",
+    "Jinkyoo Park",
+]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
@@ -28,36 +38,14 @@ graph = ["torch_geometric"]
 testing = ["pytest", "pytest-cov"]
 solvers = ["pyvrp", "ortools"]
 
-
-# Ruff + Black + isort combo for code formatting
-# Adapted from https://github.com/AntonOsika/gpt-engineer (kudos!)
-# https://beta.ruff.rs/docs/configuration/#using-pyprojecttoml
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
 line-length = 90
 show-fixes = false
 target-version = "py311"
 task-tags = ["TODO", "FIXME"]
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-]
 ignore = ["E501"] # never enforce `E501` (line length violations), done in Black
 
-# Ignore `E402` (import violations) and "F401" (unused imports) in all `__init__.py` files
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["E402", "F401"]
 
@@ -75,7 +63,6 @@ combine-as-imports = true
 split-on-trailing-comma = false
 lines-between-types = 1
 
-# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html
 [tool.black]
 line-length = 90
 target-version = ["py311"]
