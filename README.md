@@ -1,13 +1,28 @@
 # RouteFinder
 
+[![arXiv](https://img.shields.io/badge/arXiv-2406.15007-b31b1b.svg)](https://arxiv.org/abs/2406.15007) [![OpenReview](https://img.shields.io/badge/⚖️-OpenReview-8b1b16)](https://openreview.net/forum?id=hCiaiZ6e4G) [![Slack](https://img.shields.io/badge/slack-chat-611f69.svg?logo=slack)](https://join.slack.com/t/rl4co/shared_invite/zt-1ytz2c1v4-0IkQ8NQH4TRXIX8PrRmDhQ)
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
+
 _Towards Foundation Models for Vehicle Routing Problems_
+
+
+<table align="center">
+  <tr>
+    <td>
+      <div align="center">
+        <em>News: RouteFinder has been accepted as an <b>Oral</b> presentatation at the <a href="https://icml-fm-wild.github.io/"> ICML 2024 FM-Wild Workshop </a>! <a href="https://github.com/ai4co"> <img src="https://raw.githubusercontent.com/ai4co/assets/main/svg/ai4co_animated.svg" alt="AI4CO Logo" style="height: 1em; vertical-align: middle; transform: translateY(-20%);"> </a></em>
+      </div>
+    </td>
+  </tr>
+</table>
+
+
 
 ---
 
 <div align="center">
     <img src="assets/overview.png" alt="RouteFinder Overview" style="width: 100%; height: auto;">
 </div>
-
 
 
 ## 🚀 Installation
@@ -116,11 +131,20 @@ with additional parameters that can be found in the [eal.py](eal.py) file.
 If you find `RouteFinder` valuable for your research or applied projects:
 
 ```
-@article{berto2024routefinder,
-title={{RouteFinder}: Towards Foundation Models for Vehicle Routing Problems},
-author={Berto, Federico and Hua, Chuanbo and Zepeda, Nayeli Gast and Hottung, Andr{\'e} and Wouda, Niels and Lan, Leon and Tierney, Kevin and Park, Jinkyoo},
-year={2024},
-journal={Arxiv},
-url={https://github.com/ai4co/routefinder},
+@inproceedings{berto2024routefinder,
+    title={{RouteFinder}: Towards Foundation Models for Vehicle Routing Problems},
+    author={Berto, Federico and Hua, Chuanbo and Zepeda, Nayeli Gast and Hottung, Andr{\'e} and Wouda, Niels and Lan, Leon and Tierney, Kevin and Park, Jinkyoo},
+    booktitle={ICML 2024 Workshop on Foundation Models in the Wild (Oral)},
+    year={2024},
+    url={https://openreview.net/forum?id=hCiaiZ6e4G},
+    note={\url{https://github.com/ai4co/routefinder}}
 }
 ```
+
+---
+
+<div align="center">
+    <a href="https://github.com/ai4co">
+        <img src="https://raw.githubusercontent.com/ai4co/assets/main/svg/ai4co_animated_full.svg" alt="AI4CO Logo" style="width: 30%; height: auto;">
+    </a>
+</div>
