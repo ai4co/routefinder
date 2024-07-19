@@ -1,7 +1,7 @@
 # RouteFinder
 
 [![arXiv](https://img.shields.io/badge/arXiv-2406.15007-b31b1b.svg)](https://arxiv.org/abs/2406.15007) [![OpenReview](https://img.shields.io/badge/⚖️-OpenReview-8b1b16)](https://openreview.net/forum?id=hCiaiZ6e4G) [![Slack](https://img.shields.io/badge/slack-chat-611f69.svg?logo=slack)](https://join.slack.com/t/rl4co/shared_invite/zt-1ytz2c1v4-0IkQ8NQH4TRXIX8PrRmDhQ)
-[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)[![Test](https://github.com/ai4co/routefinder/actions/workflows/tests.yml/badge.svg)](https://github.com/ai4co/routefinder/actions/workflows/tests.yml)
 
 _Towards Foundation Models for Vehicle Routing Problems_
 
@@ -33,7 +33,7 @@ Install the package in editable mode:
 pip install -e .
 ```
 
-if you would like to install baseline solvers as well, please install using `pip install -e '.[solvers]'`
+If you would like to install all dependencies including optional solvers, please install using `pip install -e '.[dev,solver]'`.
 
 
 ## 🏁 Quickstart
@@ -128,7 +128,7 @@ with additional parameters that can be found in the [eal.py](eal.py) file.
 
 
 ### 🤩 Citation
-If you find `RouteFinder` valuable for your research or applied projects:
+If you find RouteFinder valuable for your research or applied projects:
 
 ```
 @inproceedings{berto2024routefinder,

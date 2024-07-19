@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
@@ -22,22 +22,17 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 rl4co = { git = "https://github.com/ai4co/rl4co.git", branch = "main" }
+pytest = { version = "^6.2.5", optional = true }
+pytest-cov = { version = "^3.0.0", optional = true }
+black = { version = "^23.3.0", optional = true }
+ruff = { version = "^0.1.6", optional = true }
+pre-commit = { version = "^3.3.3", optional = true }
 pyvrp = { version = "^0.9.1", optional = true }
 ortools = { version = "^9.10.4067", optional = true }
-# lkh = { git = "git@github.com:leonlan/pylkh.git", rev = "7ba9965", optional = true}
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-pytest-cov = "^3.0.0"
-black = "^23.3.0"
-ruff = "^0.1.6"
-pre-commit = "^3.3.3"
 
 [tool.poetry.extras]
-graph = ["torch_geometric"]
-testing = ["pytest", "pytest-cov"]
-solvers = ["pyvrp", "ortools"]
-all = ["graph", "testing", "solvers", "dev"]
+dev = ["pytest", "pytest-cov", "black", "ruff", "pre-commit"]
+solver = ["pyvrp", "ortools"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
