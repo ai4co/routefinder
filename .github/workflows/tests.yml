@@ -17,6 +17,10 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v3
 
+    - name: Set environment variable for macOS
+      if: runner.os == 'macOS'
+      run: echo "MAC_OS_GITHUB_RUNNER=1" >> $GITHUB_ENV
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:

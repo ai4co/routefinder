@@ -1,7 +1,15 @@
+import os
+
 from rl4co.utils.trainer import RL4COTrainer
 
 from routefinder.envs.mtvrp import MTVRPEnv
 from routefinder.models import RouteFinderBase, RouteFinderPolicy
+
+# Get env variable MAC_OS_GITHUB_RUNNER and force CPU in that case
+if "MAC_OS_GITHUB_RUNNER" in os.environ:
+    accelerator = "cpu"
+else:
+    accelerator = "auto"
 
 
 def test_training():
@@ -20,7 +28,7 @@ def test_training():
         max_epochs=1,
         gradient_clip_val=None,
         devices=1,
-        accelerator="auto",
+        accelerator=accelerator,
     )
     trainer.fit(model)
     trainer.test(model)
