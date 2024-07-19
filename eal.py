@@ -18,7 +18,7 @@ from routefinder.models.baselines.mvmoe.model import MVMoE
 ## Zero shot (after training)
 from routefinder.models.env_embeddings.mtvrp.context import ZeroShotContextEmbedding
 from routefinder.models.env_embeddings.mtvrp.init import ZeroShotInitEmbedding
-from routefinder.models.model import RouteFinderBase, RouteFinderSingleFeatSampling
+from routefinder.models.model import RouteFinderBase, RouteFinderSingleVariantSampling
 
 # Load data into env
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -159,7 +159,7 @@ def main(path, model_type="routefinder", train_type="eal", lr=3e-4):
     elif model_type == "mvmoe":
         model = MVMoE.load_from_checkpoint(path)
     elif model_type == "mtpomo":
-        model = RouteFinderSingleFeatSampling.load_from_checkpoint(path)
+        model = RouteFinderSingleVariantSampling.load_from_checkpoint(path)
     else:
         raise ValueError("Model type not recognized: {}".format(model_type))
 
