@@ -58,15 +58,19 @@ def instance2data(instance: TensorDict, scaling_factor: int) -> ProblemData:
     pickup = scale(instance["demand_backhaul"], scaling_factor)
     delivery = scale(instance["demand_linehaul"], scaling_factor)
     service = scale(instance["durations"], scaling_factor)
-    coords = scale(instance["locs"], scaling_factor)
     capacity = scale(instance["vehicle_capacity"], scaling_factor)
     max_distance = scale(instance["distance_limit"], scaling_factor)
+    matrix = scale(instance["cost_matrix"], scaling_factor)
+    # If locs is not provided, simply use zeros
+    # They are not needed since the cost matrix is used instead
+    if "locs" in instance:
+        coords = scale(instance["locs"], scaling_factor)
+    else:
+        coords = np.zeros((num_locs, 2))
 
     depot = Depot(
         x=coords[0][0],
         y=coords[0][1],
-        tw_early=time_windows[0][0],
-        tw_late=time_windows[0][1],
     )
 
     clients = [
@@ -86,9 +90,9 @@ def instance2data(instance: TensorDict, scaling_factor: int) -> ProblemData:
         num_available=num_locs - 1,  # one vehicle per client
         capacity=capacity,
         max_distance=max_distance,
+        tw_early=time_windows[0][0],
+        tw_late=time_windows[0][1],
     )
-
-    matrix = scale(instance["cost_matrix"], scaling_factor)
 
     if instance["open_route"]:
         # Vehicles do not need to return to the depot, so we set all arcs
@@ -107,7 +111,7 @@ def instance2data(instance: TensorDict, scaling_factor: int) -> ProblemData:
         # matrix[0, backhaul] = MAX_VALUE
         matrix[np.ix_(backhaul, linehaul)] = MAX_VALUE
 
-    return ProblemData(clients, [depot], [vehicle_type], matrix, matrix)
+    return ProblemData(clients, [depot], [vehicle_type], [matrix], [matrix])
 
 
 def solution2action(solution: pyvrp.Solution) -> list[int]:

@@ -22,7 +22,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 rl4co = { git = "git@github.com:ai4co/rl4co.git", branch = "main" }
-pyvrp = { version = "^0.8.2", optional = true }
+pyvrp = { version = "^0.9.1", optional = true }
 ortools = { version = "^9.10.4067", optional = true }
 # lkh = { git = "git@github.com:leonlan/pylkh.git", rev = "7ba9965", optional = true}
 
@@ -37,6 +37,7 @@ pre-commit = "^3.3.3"
 graph = ["torch_geometric"]
 testing = ["pytest", "pytest-cov"]
 solvers = ["pyvrp", "ortools"]
+all = ["graph", "testing", "solvers"]
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]
