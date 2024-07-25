@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+  <!-- Replace the content tag with appropriate information -->
+  <meta name="description" content="DESCRIPTION META TAG">
+  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG" />
+  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION TAG TAG" />
+  <meta property="og:url" content="URL OF THE WEBSITE" />
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
+  <meta property="og:image" content="static/image/your_banner_image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+
+  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG">
+  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
+  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>RouteFinder</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.svg">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/code.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+  <script src="static/js/copy-button.js"></script>
+  <textarea id="hidden-textarea" style="position: absolute; left: -9999px;" aria-hidden="true"></textarea>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+    integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+    crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+</head>
+
+<body>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">RouteFinder: Towards Foundation Models for Vehicle Routing Problems
+            </h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="https://github.com/fedebotu" target="_blank">Federico Berto</a><sup>*1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://github.com/cbhua" target="_blank">Chuanbo Hua</a><sup>*1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://github.com/ngastzepeda" target="_blank">Nayeli Gast Zepeda</a><sup>*2</sup>,
+              </span><br>
+              <span class="author-block">
+                <a href="https://github.com/ahottung" target="_blank">Andre Hottung</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://github.com/N-Wouda" target="_blank">Niels Wouda</a><sup>3</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://github.com/leonlan" target="_blank">Leon Lan</a><sup>4</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.uni-bielefeld.de/fakultaeten/wirtschaftswissenschaften/lehrbereiche/dot/index.xml"
+                  target="_blank">Kevin Tierney</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="http://silab.kaist.ac.kr/our-team/" target="_blank">Jinkyoo Park</a><sup>1,5</sup>,
+              </span>
+            </div>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <sup>1</sup>KAIST&nbsp;
+                <sup>2</sup>Bielefeld University&nbsp;
+                <sup>3</sup>University of Groningen&nbsp;
+                <sup>4</sup>VU Amsterdam&nbsp;
+                <sup>5</sup>OMELET&nbsp;
+                AI4CO<sup>&dagger;</sup>
+              </span>
+            </div>
+            <div class="is-size-5 conference">
+              <span class="conference">
+                <i><a href="https://icml-fm-wild.github.io">ICML 2024 FM-Wild Workshop Oral Presentation</a></i>
+              </span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- Arxiv PDF link -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/pdf/<ARXIV PAPER ID>.pdf" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+
+                <!-- Github link -->
+                <span class="link-block">
+                  <a href="https://github.com/ai4co/routefinder" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+
+                <!-- ArXiv abstract Link -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2406.15007" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+
+                <!-- Slack Link (AI4CO) -->
+                <span class="link-block">
+                  <a href="https://bit.ly/ai4co-slack" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-slack"></i>
+                    </span>
+                    <span>Slack</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Title Image -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/overview.svg" alt="RouteFinder Overview" width="960px"/>
+      </div>
+    </div>
+  </section>
+  <!-- End teaser video -->
+
+  <!-- Paper abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Vehicle Routing Problems (VRPs) are optimization problems with significant real-world implications 
+              in logistics, transportation, and supply chain management. Despite the recent progress made in learning 
+              to solve individual VRP variants, there is a lack of a unified approach that can effectively tackle a wide 
+              range of tasks, which is crucial for real-world impact. This paper introduces <b>RouteFinder</b>, a framework for 
+              developing foundation models for VRPs. Our key idea is that a foundation model for VRPs should be able to 
+              model variants by treating each variant as a subset of a larger VRP problem, equipped with different attributes. 
+              We introduce a parallelized environment that can handle any combination of attributes at the same time in a 
+              batched manner, and an efficient sampling procedure to train on a mix of problems at each optimization step 
+              that can greatly improve convergence robustness. We also introduce novel Global Feature Embeddings that 
+              project instance-wise attributes efficiently onto the latent space and help the model understand different 
+              VRP variants. Finally, we introduce Efficient Adapter Layers, a simple yet effective technique to finetune 
+              pre-trained RouteFinder models to solve novel variants with previously unseen attributes outside of the 
+              original feature space. We validate our approach through extensive experiments on 24 VRP variants, demonstrating 
+              competitive results over recent multi-task learning models. We make our code openly available 
+              at <a href="https://github.com/ai4co/routefinder" target="_blank">this https URL</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End paper abstract -->
+
+  <br>
+  <br>
+
+  <!-- Embedded Google Slides -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <h2 class="title is-4">ICML 2024 FM-Wild Workshop Oral Presentation Slides</h2>
+      <div class="hero-body">
+        <iframe
+          src="https://docs.google.com/presentation/d/e/2PACX-1vSxPBfuH2Ydrc3Y1y7YTjGar-IQ-RG6HoTHbQs3sAboDD5tp-aL66-AESeK35P7JmvKJx9GEAgHIvsu/embed?start=false&loop=false&delayms=3000"
+          frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true"
+          webkitallowfullscreen="true"></iframe>
+      </div>
+    </div>
+  </section>
+  <!-- End embedded Google Slides -->
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">Vehicle Routing Problems</h2>
+      <div class="hero-body">
+        <p>
+          We consider a collection of VRP variants that each consist of one or more attributes, 
+          resulting in a rich set of routing problems with practical relevance. 
+          Each of these variants offers a unique generalization task for RouteFinder.
+          We consider in total 24 VRP variants. We divide the attributes we consider into <b>node attributes</b>, 
+          <b>global attributes</b>, and <b>edge attributes</b>. Node attributes are specific to the depot and customer 
+          nodes and local to specific nodes, such as <i>(linehaul) demands</i>, <i>backhaul demands</i>, and <i>time windows</i>. 
+          Global attributes represent structural aspects of the problem as a whole, 
+          e.g., <i>open vs. closed routes</i>, <i>distance limits</i>, and <i>the type of backhaul</i>. 
+        </p>
+        <!-- <br>
+        <h3 class="title is-4">Node Attributes</h3>
+        <ul>
+          <li>
+            Demand and Vehicle Capacity (C): Every customer i ∈ Nc has a linehaul demand qi that needs 
+            to be served using vehicles with a homogeneous fixed capacity Q > 0. The total customer demand 
+            in the vehicle must not exceed its capacity at any point of the route.
+          </li>
+          <li>
+            Time Windows (TW): Every customer i ∈ Nc has a time window [ei , li ] during which service must begin. 
+            Service takes si time. The depot has a time window [e0 , l0 ] = [0, T ], and a service duration of s0 = 0. 
+            Vehicles must reach node i before the end of its time window at li, but any early arrivals must 
+            wait at the node location until time ei before service may commence.
+          </li>
+          <li>
+            Backhaul Demands (B): Backhauls generalize demand to also account for return shipments. 
+            Customers are either linehaul or backhaul customers. Linehaul customers require delivery of 
+            a demand qi that needs to be transported from the depot to customer i (as in the CVRP), 
+            whereas backhaul customers need a pickup of an amount pi that is transported from the client back to the depot. 
+          </li>
+        </ul>
+        <br>
+        <h3 class="title is-4">Global Attributes</h3>
+        <ul>
+          <li>
+            Open Routes (O): Vehicles are not required to return to the depot after serving all customers. 
+            Open routes can be found in applications with third-party drivers, who are often only compensated 
+            until they have completed their last delivery
+          </li>
+          <li>
+            Duration Limits (L): Imposes a limit on the total travel duration (or length) of each route, 
+            balancing the workload across vehicles. This limit is uniformly applied to all routes.
+          </li>
+          <li>
+            Mixed (M) Backhauls: Relaxes the strict precedence constraint of linehaul cus- tomers before 
+            any backhaul customers: with mixed backhauls, linehaul and backhaul customers may be mixed 
+            along the route in any configuration. The vehicle’s capacity must of course still be 
+            respected by the delivery and pickup amounts in the vehicle at any point along the route.
+          </li>
+        </ul> -->
+      </div>
+    </div>
+  </section>
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/problems/main.svg" alt="RouteFinder Problems" width="960px"/>
+        <p class="has-text-centered">
+          Different VRP attributes. <b>Open routes (O)</b> and <b>duration limits (L)</b> are global attributes, 
+          whereas <b>time windows (TW)</b>, <b>capacitated vehicles for linehaul demands (C)</b>, <b>backhaul demands (B)</b> 
+          and <b>mixed (M) backhaul demands</b> are node attributes. Attributes may be combined in 
+          different ways to define VRP variants.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+
+  <section class="hero teaser is-light">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 is-3-light">Unified VRP Environment</h2>
+      <div class="hero-body">
+        <p>
+          We define an environment capable of modeling all of the previously discussed VRP attributes 
+          simultaneously, essentially building an OVRPBLTW environment: an open route vehicle routing 
+          problem with linehauls, backhauls, distance limit, and time windows. The environment supports 
+          subsets of the OVRPBLTW defining other VRP variants, i.e., some attributes can be “turned off.”
+          In this way, all attributes characterizing a VRP variant can simply be turned “on” and “off”, 
+          allowing us to model up to 16 different problem types with one single environment. 
+          This approach can be easily extended (e.g., by including different location sampling mechanisms, 
+          backhaul classes, etc.), allowing for even more future problem variants to be modeled with the 
+          same environment.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 is-3-light">Mixed Batch Training</h2>
+      <div class="hero-body">
+        <p>
+          We introduce a flexible approach which we coin <b>Mixed Batch Training (MBT)</b> 
+          to efficiently reuse a single dataset to generate multiple problem variants, 
+          optimizing data storage and processing capabilities. We observe that the OVRPBLTW 
+          problem variant is the most general problem variant we study in this paper, 
+          and can be used to generate any of the other variants by selectively removing 
+          the (O), (B), (L), or (TW) attributes. MBT is flexible and scalable, 
+          capable of adapting to any problem where different constraints or 
+          features might be selectively activated or deactivated.
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/sampling.svg" alt="RouteFinder Mixed Batch Training" width="560px"/>
+        <p class="has-text-centered">
+          <b>[Left]</b> Training without MBT may lead to instability since at each step the optimization 
+          is biased toward a single task. <br><b>[Right]</b> Training RouteFinder with MBT allows for more stable training.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="hero teaser is-light">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 is-3-light">Efficient Adapter Layers</h2>
+      <div class="hero-body">
+        <p>
+          We propose <b>Efficient Adapter Layers (EAL)</b>, a simple yet effective approach for few-shot 
+          learning for VRP foundation models. Consider a linear projection layer \(\mathbf{W}\in\mathbb{R}^{k\times d}\) as the 
+          original weight matrix for the projection from the raw attribute to latent space, 
+          where \(k\) is the number of attributes and \(d\) is the hidden dimension. In this work, 
+          for simplicity, we consider unbiased linear projections to the latent space. This 
+          can be trivially extended to general affine projections using a bias term. 
+          To accommodate \(l\) new attributes, EAL augments \(\mathbf{W}\) with zeros. 
+          The new matrix \(\mathbf{W}^{\prime}\in\mathbb{R}^{(k+l)\times d}\) can be written as
+        </p>
+        <img src="static/images/eal.png" alt="RouteFinder EAL" width="560px"/>
+        <p>
+          where \(\mathbf{0}\in \mathbb{R}^{l\times d}\) is a matrix of zeros. Thus, the augmented matrix \(W^{\prime}\) 
+          retains the original \(k\) attributes and adds \(l\) new attributes, which are initialized to 
+          zero. Note that doing so does not affect the model as the new \(l\) dimensions are muted 
+          until fine-tuning on new variants occurs, enabling many new attributes to be included 
+          in virtually any part of the model via EAL.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 is-3-light">Main Results</h2>
+      <div class="hero-body">
+        <p>
+          RouteFinder can scale better than the neural baselines in real-world settings. 
+          Moreover, training on any possible attribute combination (either with our MBT 
+          sampling or without) greatly improves the performance of RouteFinder and baselines, 
+          even for tasks such as CVRP, both in distribution and real-world benchmarks.
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/table.png" alt="RouteFinder Main Results" width="960px"/>
+        <p class="has-text-centered">
+          Performance on 1000 test instances of trained VRPs. * represents the best solutions 
+          against which the other gaps are computed. Best neural approach in <b>bold</b>; second <u>underlined</u>.
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/generalization.png" alt="RouteFinder Main Results" width="660px"/>
+        <p class="has-text-centered">
+          Zero and few-shot generalization on three independent runs. RF-POMO with "-" and RF-MoE-L is denoted by "- -" 
+          linestyles. RouteFinder's Efficient Adapter Layers (EAL) enable fast finetuning to novel VRPs, 
+          even with new attributes that have never been seen by the model before.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section" id="Code">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <div class="code-container">
+        <pre><code class="code-content language-python">@article{berto2024routefinder,
+  title={RouteFinder: Towards foundation models for vehicle routing problems},
+  author={Berto, Federico and Hua, Chuanbo and Zepeda, Nayeli Gast and Hottung, Andr{\'e} and Wouda, Niels and Lan, Leon and Tierney, Kevin and Park, Jinkyoo},
+  journal={arXiv preprint arXiv:2406.15007},
+  year={2024}
+}</code></pre>
+        <button class="copy-button" aria-label="Copy to clipboard">
+          <svg class="copy-icon" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z">
+            </path>
+            <path fill-rule="evenodd"
+              d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z">
+            </path>
+          </svg>
+          <svg class="checkmark-icon" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z">
+            </path>
+          </svg>
+        </button>
+        <div class="copy-tooltip">Copy to clipboard</div>
+      </div>
+    </div>
+  </section>
+
+  </section>
+  <!--End BibTex citation -->
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+                target="_blank">Academic Project Page Template</a> which was adopted from the <a
+                href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              You are free to borrow the of this website, we just ask that you link back to this page in the footer.
+              <br> This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>

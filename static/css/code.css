@@ -1,0 +1,84 @@
+.code-container {
+    position: relative;
+    background-color: #363636;
+    border-radius: 6px;
+    padding: 1rem 2.5rem 0rem 1rem;
+    margin-top: 1rem;
+    border: 1px solid #30363d;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .code-container pre {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    white-space: pre;
+    word-wrap: normal;
+  }
+  .code-content {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85em;
+    line-height: 1.45;
+    color: #ffffff;
+    display: inline-block;
+  }
+  .copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    width: 32px;
+    height: 32px;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+  }
+  .copy-button:hover {
+    background-color: #282c34;
+  }
+  .copy-icon, .checkmark-icon {
+    width: 16px;
+    height: 16px;
+    transition: all 0.2s ease-in-out;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+  }
+  .copy-icon {
+    fill: #8b949e;
+  }
+  .copy-button:hover .copy-icon {
+    fill: #c9d1d9;
+  }
+  .checkmark-icon {
+    fill: #3fb950;
+    transform: scale(0);
+    opacity: 0;
+  }
+  .copy-button.copied .copy-icon {
+    transform: scale(0);
+    opacity: 0;
+  }
+  .copy-button.copied .checkmark-icon {
+    transform: scale(1);
+    opacity: 1;
+  }
+  .copy-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    border: 1px solid #30363d;
+  }
+  .copy-button:hover + .copy-tooltip {
+    opacity: 1;
+  }

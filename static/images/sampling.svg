@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="259 413 330 119" width="330" height="119">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 8 8" markerWidth="8" markerHeight="8" color="#005493">
+      <g>
+        <path d="M 6 0 L 0 0 M 0 -2.25 L 6 0 L 0 2.25" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 8 8" markerWidth="8" markerHeight="8" color="#005493" opacity=".5">
+      <g>
+        <path d="M 6 0 L 0 0 M 0 -2.25 L 6 0 L 0 2.25" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker_3" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 8 8" markerWidth="8" markerHeight="8" color="#008f00">
+      <g>
+        <path d="M 6 0 L 0 0 M 0 -2.25 L 6 0 L 0 2.25" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker_4" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#008f00" opacity=".2">
+      <g>
+        <path d="M 4 0 L 0 0 M 0 -1.5 L 4 0 L 0 1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="Version_3" stroke-opacity="1" stroke="none" fill="none" stroke-dasharray="none" fill-opacity="1">
+    <title>Version 3</title>
+    <g id="Version_3_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_2">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(275.50172 413.5)" fill="#5e5e5e">
+          <tspan font-family="Latin Modern Sans" font-size="10" fill="#5e5e5e" x="21316282e-20" y="12">Without Mixed Batch Training</tspan>
+        </text>
+      </g>
+      <g id="Graphic_5">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(451.005 413.5)" fill="#5e5e5e">
+          <tspan font-family="Latin Modern Sans" font-size="10" fill="#5e5e5e" x="7887024e-19" y="12">With Mixed Batch Training</tspan>
+        </text>
+      </g>
+      <g id="Graphic_7">
+        <rect x="259.88672" y="431.452" width="160" height="100" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_9">
+        <ellipse cx="371" cy="475.5" rx="21.5000343548908" ry="13.0000207727247" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_11">
+        <ellipse cx="364.6192" cy="477.9288" rx="34.0000543286644" ry="20.0000319580379" stroke="#c1c1c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_12">
+        <ellipse cx="358.3096" cy="477.9288" rx="44.0000703076835" ry="26.5000423444002" stroke="#d6d6d6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_13">
+        <ellipse cx="349.75" cy="478.25" rx="58.2500930777855" ry="34.2500547281399" stroke="#d6d6d6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_14">
+        <ellipse cx="340.75" cy="481.25" rx="72.750116247363" ry="43.250069109257" stroke="#ebebeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_15">
+        <path d="M 375.89922 470.1124 L 377.0218 473.5673 L 380.6545 473.5673 L 377.7156 475.7026 L 378.83815 479.1575 L 375.89922 477.02223 L 372.9603 479.1575 L 374.08287 475.7026 L 371.14394 473.5673 L 374.77665 473.5673 Z" fill="#ff2600" fill-opacity=".3"/>
+        <path d="M 375.89922 470.1124 L 377.0218 473.5673 L 380.6545 473.5673 L 377.7156 475.7026 L 378.83815 479.1575 L 375.89922 477.02223 L 372.9603 479.1575 L 374.08287 475.7026 L 371.14394 473.5673 L 374.77665 473.5673 Z" stroke="#941100" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Graphic_16">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(383.5 470.166)" fill="#941100">
+          <tspan font-family="Monaco" font-size="8" fill="#941100" x="0" y="8">Optimal</tspan>
+        </text>
+      </g>
+      <g id="Graphic_33">
+        <circle cx="277.67672" cy="494" r="2.50000399475473" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="277.67672" cy="494" r="2.50000399475473" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_34">
+        <line x1="278.7229" y1="491.7287" x2="289.00637" y2="469.4025" marker-end="url(#StickArrow_Marker)" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Graphic_35">
+        <circle cx="292.7384" cy="461.3" r="2.50000399475473" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="292.7384" cy="461.3" r="2.50000399475473" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_36">
+        <circle cx="309.7" cy="494" r="2.50000399475474" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="309.7" cy="494" r="2.50000399475474" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_37">
+        <circle cx="316.8096" cy="462.5" r="2.50000399475473" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="316.8096" cy="462.5" r="2.50000399475473" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_38">
+        <circle cx="333.1192" cy="491.5" r="2.50000399475473" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="333.1192" cy="491.5" r="2.50000399475473" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_39">
+        <circle cx="340.75" cy="468.1" r="2.50000399475473" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="340.75" cy="468.1" r="2.50000399475473" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_40">
+        <circle cx="358.3096" cy="486" r="2.50000399475474" fill="#0096ff" fill-opacity=".2"/>
+        <circle cx="358.3096" cy="486" r="2.50000399475474" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_41">
+        <line x1="293.8898" y1="463.5198" x2="305.5925" y2="486.08123" marker-end="url(#StickArrow_Marker)" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_42">
+        <line x1="310.2505" y1="491.561" x2="314.84567" y2="471.20145" marker-end="url(#StickArrow_Marker)" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_43">
+        <line x1="318.0354" y1="464.6796" x2="328.74634" y2="483.72467" marker-end="url(#StickArrow_Marker)" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_44">
+        <line x1="333.89445" y1="489.1227" x2="337.98433" y2="476.581" marker-end="url(#StickArrow_Marker)" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_45">
+        <line x1="342.5007" y1="469.88466" x2="352.06304" y2="479.63235" marker-end="url(#StickArrow_Marker)" stroke="#005493" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_46">
+        <line x1="359.12917" y1="483.63755" x2="362.78944" y2="473.08666" marker-end="url(#StickArrow_Marker_2)" stroke="#005493" stroke-opacity=".5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.800000011920929,2.400000035762787" stroke-width=".8"/>
+      </g>
+      <g id="Graphic_47">
+        <rect x="428.5" y="431.452" width="160" height="100" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_48">
+        <ellipse cx="539.6133" cy="475.5" rx="21.5000343548909" ry="13.0000207727247" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_49">
+        <ellipse cx="533.2325" cy="477.9288" rx="34.0000543286645" ry="20.0000319580379" stroke="#c1c1c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_50">
+        <ellipse cx="526.9229" cy="477.9288" rx="44.0000703076834" ry="26.5000423444002" stroke="#d6d6d6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_51">
+        <ellipse cx="518.3633" cy="478.25" rx="58.2500930777855" ry="34.2500547281399" stroke="#d6d6d6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_52">
+        <ellipse cx="509.3633" cy="481.25" rx="72.7501162473629" ry="43.250069109257" stroke="#ebebeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_53">
+        <path d="M 544.5125 470.1124 L 545.6351 473.5673 L 549.2678 473.5673 L 546.32886 475.7026 L 547.4514 479.1575 L 544.5125 477.02223 L 541.5736 479.1575 L 542.69615 475.7026 L 539.7572 473.5673 L 543.38994 473.5673 Z" fill="#ff2600" fill-opacity=".3"/>
+        <path d="M 544.5125 470.1124 L 545.6351 473.5673 L 549.2678 473.5673 L 546.32886 475.7026 L 547.4514 479.1575 L 544.5125 477.02223 L 541.5736 479.1575 L 542.69615 475.7026 L 539.7572 473.5673 L 543.38994 473.5673 Z" stroke="#941100" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Graphic_54">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(552.1133 470.166)" fill="#941100">
+          <tspan font-family="Monaco" font-size="8" fill="#941100" x="0" y="8">Optimal</tspan>
+        </text>
+      </g>
+      <g id="Graphic_55">
+        <circle cx="446.29" cy="494" r="2.50000399475474" fill="#00fa00" fill-opacity=".2"/>
+        <circle cx="446.29" cy="494" r="2.50000399475474" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_56">
+        <line x1="448.64385" y1="493.156" x2="465.5029" y2="487.1109" marker-end="url(#StickArrow_Marker_3)" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Graphic_69">
+        <circle cx="473.9" cy="484.1" r="2.50000399475473" fill="#00fa00" fill-opacity=".2"/>
+        <circle cx="473.9" cy="484.1" r="2.50000399475473" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_70">
+        <circle cx="501.5" cy="478.1" r="2.50000399475473" fill="#00fa00" fill-opacity=".2"/>
+        <circle cx="501.5" cy="478.1" r="2.50000399475473" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_72">
+        <circle cx="526.3" cy="475.3" r="2.50000399475477" fill="#00fa00" fill-opacity=".2"/>
+        <circle cx="526.3" cy="475.3" r="2.50000399475477" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_73">
+        <line x1="476.34325" y1="483.56887" x2="492.7833" y2="479.99494" marker-end="url(#StickArrow_Marker_3)" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_76">
+        <line x1="528.7893" y1="475.0679" x2="534.7133" y2="474.51555" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.800000011920929,2.400000035762787" stroke-width=".8"/>
+      </g>
+      <g id="Line_78">
+        <line x1="447.05787" y1="491.6203" x2="453.4794" y2="471.71915" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_79">
+        <line x1="448.18386" y1="492.36787" x2="463.64145" y2="479.04646" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_80">
+        <line x1="448.7378" y1="494.5095" x2="466.39226" y2="498.1844" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_81">
+        <line x1="475.3765" y1="482.08214" x2="483.69523" y2="470.71306" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_82">
+        <line x1="476.0386" y1="482.8041" x2="488.992" y2="474.9549" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_83">
+        <line x1="476.2978" y1="484.80917" x2="492.0446" y2="489.46633" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_84">
+        <line x1="503.7226" y1="476.95396" x2="515.7473" y2="470.7536" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_85">
+        <line x1="503.1787" y1="476.24737" x2="511.31756" y2="467.2651" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_86">
+        <line x1="503.8599" y1="478.92684" x2="516.5779" y2="483.38276" marker-end="url(#StickArrow_Marker_4)" stroke="#008f00" stroke-opacity=".2" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Line_90">
+        <line x1="503.9843" y1="477.8195" x2="517.4362" y2="476.30076" marker-end="url(#StickArrow_Marker_3)" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width=".8"/>
+      </g>
+      <g id="Graphic_91">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(268.07516 454.666)" fill="#005493">
+          <tspan font-family="Monaco" font-size="8" fill="#005493" x="0" y="8">CVRP</tspan>
+        </text>
+      </g>
+      <g id="Graphic_92">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(297.69805 499)" fill="#005493">
+          <tspan font-family="Monaco" font-size="8" fill="#005493" x="0" y="8">VRPTW</tspan>
+        </text>
+      </g>
+      <g id="Graphic_93">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(304.80764 448.5)" fill="#005493">
+          <tspan font-family="Monaco" font-size="8" fill="#005493" x="0" y="8">OVRPB</tspan>
+        </text>
+      </g>
+      <g id="Graphic_94">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(330.70212 491.1997)" fill="#005493">
+          <tspan font-family="Monaco" font-size="8" fill="#005493" x="0" y="8">…</tspan>
+        </text>
+      </g>
+      <g id="Graphic_95">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(447.0791 456.46407)" fill="#008f00" fill-opacity=".5">
+          <tspan font-family="Monaco" font-size="8" fill="#008f00" fill-opacity=".5" x="0" y="8">CVRP</tspan>
+        </text>
+      </g>
+      <g id="Graphic_96">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(458.4983 466.2)" fill="#008f00" fill-opacity=".5">
+          <tspan font-family="Monaco" font-size="7" fill="#008f00" fill-opacity=".5" x="0" y="7">VRPTW</tspan>
+        </text>
+      </g>
+      <g id="Graphic_97">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(471.4 495)" fill="#008f00" fill-opacity=".5">
+          <tspan font-family="Monaco" font-size="8" fill="#008f00" fill-opacity=".5" x="0" y="8">OVRPB</tspan>
+        </text>
+      </g>
+      <g id="Graphic_98">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(487.7168 458.8)" fill="#008f00" fill-opacity=".5">
+          <tspan font-family="Monaco" font-size="8" fill="#008f00" fill-opacity=".5" x="0" y="8">…</tspan>
+        </text>
+      </g>
+      <g id="Graphic_99">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(497.5 483.33204)" fill="#008f00" fill-opacity=".5">
+          <tspan font-family="Monaco" font-size="8" fill="#008f00" fill-opacity=".5" x="0" y="8">…</tspan>
+        </text>
+      </g>
+      <g id="Graphic_100">
+        <title>Single Attribute Sampling</title>
+        <text transform="translate(493.47465 462.766)" fill="#008f00" fill-opacity=".5">
+          <tspan font-family="Monaco" font-size="8" fill="#008f00" fill-opacity=".5" x="0" y="8">…</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

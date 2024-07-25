@@ -1,0 +1,198 @@
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+a {
+  color: #DE3412;              /* Default text color */
+  text-decoration: none;    /* Removes underline */
+  transition: color 0.3s;   /* Smooth transition for color change */
+}
+
+/* Style for hover state */
+a:hover {
+  text-decoration: underline; /* Adds underline on hover */
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dnerf {
+  font-variant: small-caps;
+}
+
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+
+.publication-title {
+}
+
+.publication-banner {
+  max-height: parent;
+
+}
+
+.publication-banner video {
+  position: relative;
+  left: auto;
+  top: auto;
+  object-fit: fit;
+}
+
+.publication-header .hero-body {
+}
+
+.publication-title {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-authors {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-venue {
+    color: #555;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.publication-awards {
+    color: #ff3860;
+    width: fit-content;
+    font-weight: bolder;
+}
+
+.publication-authors {
+}
+
+.publication-authors a {
+   color: #DE3412 !important;
+}
+
+.publication-authors a:hover {
+    text-decoration: underline;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+.publication-banner img {
+}
+
+.publication-authors {
+  /*color: #4286f4;*/
+}
+
+.publication-video {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 10px !important;
+}
+
+.publication-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.publication-body img {
+}
+
+.results-carousel {
+  overflow: hidden;
+}
+
+.results-carousel .item {
+  margin: 5px;
+  overflow: hidden;
+  padding: 20px;
+  font-size: 0;
+}
+
+.results-carousel video {
+  margin: 0;
+}
+
+.slider-pagination .slider-page {
+  background: #000000;
+}
+
+.eql-cntrb { 
+  font-size: smaller;
+}
+
+.conference { 
+  font-family: 'Google Sans', sans-serif;
+  padding-top: 10px;
+}
+
+
+/* Button styles */
+.button.is-dark {
+  background-color: #DE3412;
+  color: #fff;
+  border-color: #DE3412;
+  transition: all 0.3s ease;
+}
+
+.button.is-dark:hover {
+  background-color: #fff;
+  color: #DE3412;
+  border-color: #DE3412;
+}
+
+.button.is-dark .icon i {
+  color: #fff;
+}
+
+.button.is-dark:hover .icon i {
+  color: #DE3412;
+}
+
+
+.subtitle {
+  font-size: 1em;
+}
+
+ul {
+  padding-left: 20px; /* Adjusts the indentation of the list */
+}
+
+/* Styling for list items */
+li {
+  list-style-type: disc; /* Ensures the bullet point is a disc */
+  padding-bottom: 10px;
+}
+
+.is-3-light {
+  padding-top: 50px;
+}
+
+img {
+  display: block;
+  padding-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
