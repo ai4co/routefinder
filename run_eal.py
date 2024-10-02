@@ -1,43 +1,59 @@
 from copy import deepcopy
 
 import torch
-import wandb
+import torch.nn as nn
 
 from lightning.pytorch.callbacks import LearningRateMonitor, RichModelSummary
 from lightning.pytorch.loggers import WandbLogger
-from rl4co.models.zoo import AttentionModelPolicy
 from rl4co.utils.callbacks.speed_monitor import SpeedMonitor
 
 # new model
 from rl4co.utils.trainer import RL4COTrainer
+
+import wandb
 
 from routefinder.envs import MTVRPEnv, MTVRPGenerator
 from routefinder.models.baselines.mvmoe.model import MVMoE
 
 ## Normal training (note that we will actually just load a checkpoint)
 ## Zero shot (after training)
-from routefinder.models.env_embeddings.mtvrp.context import ZeroShotContextEmbedding
-from routefinder.models.env_embeddings.mtvrp.init import ZeroShotInitEmbedding
-from routefinder.models.model import RouteFinderBase, RouteFinderSingleVariantSampling
+from routefinder.models.env_embeddings.mtvrp.context import MTVRPContextEmbeddingM
+from routefinder.models.env_embeddings.mtvrp.init import MTVRPInitEmbeddingM
+from routefinder.models.model import (
+    RouteFinderBase,
+    RouteFinderMoE,
+    RouteFinderSingleVariantSampling,
+)
 
 # Load data into env
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def reinit_model(model):
-    """Reinitializes from scratch with new model and new embeddings"""
-    print("Reinitializing full model from scratch")
-    embed_dim = 128
-    new_policy = AttentionModelPolicy(
-        embed_dim=embed_dim,
-        use_graph_context=False,
-        num_encoder_layers=6,
-        normalization="instance",
-        init_embedding=ZeroShotInitEmbedding(embed_dim),
-        context_embedding=ZeroShotContextEmbedding(embed_dim),
-    )
+def freeze_backbone(policy):
+    # Freeze all the parameters in the model
+    for param in policy.parameters():
+        param.requires_grad = False
+    # Unfreeze embeddings
+    for param in policy.encoder.init_embedding.parameters():
+        param.requires_grad = True
+    for param in policy.decoder.context_embedding.parameters():
+        param.requires_grad = True
+    return policy
 
-    model.policy = new_policy
+
+def model_from_scratch(model):
+    """Reinitializes from scratch with new model and new embeddings"""
+
+    print("Reinitializing full model from scratch")
+    embed_dim = model.policy.encoder.init_embedding.embed_dim
+
+    def reset_weights(m):
+        if isinstance(m, nn.Module) and hasattr(m, "reset_parameters"):
+            m.reset_parameters()
+
+    model.policy.apply(reset_weights)
+    model.policy.encoder.init_embedding = MTVRPInitEmbeddingM(embed_dim=embed_dim)
+    model.policy.decoder.context_embedding = MTVRPContextEmbeddingM(embed_dim=embed_dim)
 
     # Add `_multistart` to decode type for train, val and test in policy
     for phase in ["train", "val", "test"]:
@@ -46,71 +62,44 @@ def reinit_model(model):
     return model
 
 
-def no_adapter_layers(model):
-    """In this case, we don't add any adapter layers, but keep the model the same.
-    Of course, it would be harder for the model to understand the new features
+def adapter_layers(model, adapter_only=False):
+    """Adapter Layers (AL) from Lin et al., 2024.
+    Only initializes new adapter layers (embeddings), but keeps the model parameters the same.
     """
-    return model
+    print("Using Adapter Layers (AL)")
 
-
-def reinit_embeddings_only(model):
-    """Only reinitializes the embeddings, but keeps the model parameters the same"""
-    print("Reinitializing embeddings only")
-
-    embed_dim = 128
+    embed_dim = model.policy.encoder.init_embedding.embed_dim
     policy = model.policy
 
-    new_init_embedding = ZeroShotInitEmbedding(embed_dim=embed_dim)
-    new_context_embedding = ZeroShotContextEmbedding(embed_dim=embed_dim)
+    new_init_embedding = MTVRPInitEmbeddingM(embed_dim=embed_dim)
+    new_context_embedding = MTVRPContextEmbeddingM(embed_dim=embed_dim)
 
     policy.encoder.init_embedding = new_init_embedding
     policy.decoder.context_embedding = new_context_embedding
+
+    # If not full, then we freeze the backbone
+    if adapter_only:
+        policy = freeze_backbone(policy)
 
     model.policy = policy
     return model
 
 
-def init_embed_freeze_backbone(model):
-    """Freezes the decoder and only trains the encoder"""
-    print("Freezing backbone, intializing embeddings only")
-    embed_dim = 128
-    policy = model.policy
-
-    # Freeze all the parameters in the model
-    for param in policy.parameters():
-        param.requires_grad = False
-
-    new_init_embedding = ZeroShotInitEmbedding(embed_dim=embed_dim)
-    new_context_embedding = ZeroShotContextEmbedding(embed_dim=embed_dim)
-
-    policy.encoder.init_embedding = new_init_embedding
-    policy.decoder.context_embedding = new_context_embedding
-
-    # Unfreeze embeddings
-    for param in policy.encoder.init_embedding.parameters():
-        param.requires_grad = True
-    for param in policy.decoder.context_embedding.parameters():
-        param.requires_grad = True
-
-    model.policy = policy
-    return model
-
-
-def eal_substitute(model):
-    """Efficient Active Layers
+def efficient_adapter_layers(model, adapter_only=False):
+    """Efficient Active Layers (ours).
     Keep the model the same, replace the embeddings with
     new zero-padded embeddings for unseen features
     """
 
-    print("Using EAL")
+    print("Using Efficient Adapter Layers (EAL)")
 
     policy = model.policy
     embed_dim = policy.decoder.context_embedding.embed_dim
 
     policy_new = deepcopy(policy)
 
-    init_embedding_new_feat = ZeroShotInitEmbedding(embed_dim=embed_dim)
-    context_embedding_new_feat = ZeroShotContextEmbedding(embed_dim=embed_dim)
+    init_embedding_new_feat = MTVRPInitEmbeddingM(embed_dim=embed_dim)
+    context_embedding_new_feat = MTVRPContextEmbeddingM(embed_dim=embed_dim)
 
     policy_new.encoder.init_embedding = init_embedding_new_feat
     policy_new.decoder.context_embedding = context_embedding_new_feat
@@ -126,7 +115,7 @@ def eal_substitute(model):
         [proj_glob_params_old, torch.zeros_like(proj_glob_params_old[:, :1])], dim=-1
     )
 
-    init_embed_new = ZeroShotInitEmbedding(embed_dim=embed_dim)
+    init_embed_new = MTVRPInitEmbeddingM(embed_dim=embed_dim)
     init_embed_new.project_global_feats.weight.data = proj_glob_params_new
     init_embed_new.project_customers_feats.weight.data = (
         init_embedding_old.project_customers_feats.weight.data
@@ -141,40 +130,52 @@ def eal_substitute(model):
         [proj_context_old, torch.zeros_like(proj_context_old[:, :1])], dim=-1
     )
 
-    context_embed_new = ZeroShotContextEmbedding(embed_dim=embed_dim)
+    context_embed_new = MTVRPContextEmbeddingM(embed_dim=embed_dim)
     context_embed_new.project_context.weight.data = proj_context_new
 
     # Replace above into the policy
     policy_new.encoder.init_embedding = init_embed_new
     policy_new.decoder.context_embedding = context_embed_new
 
+    # If not full, then we freeze the backbone
+    if adapter_only:
+        policy_new = freeze_backbone(policy_new)
+
     model.policy = policy_new
     return model
 
 
 # Load checkpoint
-def main(path, model_type="routefinder", train_type="eal", lr=3e-4):
-    if model_type == "routefinder":
-        model = RouteFinderBase.load_from_checkpoint(path)
+def main(path, model_type="rf", train_type="eal-full", lr=3e-4):
+    if "rf" in model_type:
+        if "moe" in model_type:
+            model = RouteFinderMoE.load_from_checkpoint(path, map_location="cpu")
+        else:
+            model = RouteFinderBase.load_from_checkpoint(path, map_location="cpu")
     elif model_type == "mvmoe":
-        model = MVMoE.load_from_checkpoint(path)
+        model = MVMoE.load_from_checkpoint(path, map_location="cpu")
     elif model_type == "mtpomo":
-        model = RouteFinderSingleVariantSampling.load_from_checkpoint(path)
+        model = RouteFinderSingleVariantSampling.load_from_checkpoint(
+            path, map_location="cpu"
+        )
     else:
         raise ValueError("Model type not recognized: {}".format(model_type))
 
     model = model.to(device)
 
-    if train_type == "eal":
-        model = eal_substitute(model)
-    elif train_type == "reinit":
-        model = reinit_model(model)
-    elif train_type == "reinit_embeddings":
-        model = reinit_embeddings_only(model)
-    elif train_type == "no_adapter":
-        model = no_adapter_layers(model)
-    elif train_type == "init_embed_freeze_backbone":
-        model = init_embed_freeze_backbone(model)
+    if "eal" in train_type:
+        model = efficient_adapter_layers(model, adapter_only="adapter" in train_type)
+    # elif train_type == "al":
+    elif "al" in train_type:
+        model = adapter_layers(model, adapter_only="adapter" in train_type)
+    elif train_type == "scratch":
+        model = model_from_scratch(model)
+    else:
+        raise ValueError(
+            "Training type not recognized: {}. Choose from ['eal', 'al', 'scratch']".format(
+                train_type
+            )
+        )
 
     # Set correct paths
     dataloader_names = [
@@ -246,13 +247,15 @@ def main(path, model_type="routefinder", train_type="eal", lr=3e-4):
     model.env = env
     model.setup()
     model.data_cfg["batch_size"] = 128
-    model.data_cfg["val_batch_size"] = 256
-    model.data_cfg["test_batch_size"] = 256
+    model.data_cfg["val_batch_size"] = 1024
+    model.data_cfg["test_batch_size"] = 1024
     model.data_cfg["train_data_size"] = 10_000  # instead of 100k
 
     # Test model
     logger = WandbLogger(
-        project="routefinder-eal", name=f"{model_type}-{train_type}-{lr}", reinit=True
+        project="routefinder-eal",
+        name=f"{model_type}-{train_type}-{lr}",
+        reinit=True,
     )
     rich_model_summary = RichModelSummary(max_depth=3)
     speed_monitor = SpeedMonitor(
@@ -283,22 +286,31 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_type", type=str, default="routefinder")
-    parser.add_argument("--train_type", type=str, default="eal")
-    parser.add_argument("--path", type=str, default="checkpoints/main/rf/rf-all-100.ckpt")
+    parser.add_argument(
+        "--model_type", type=str, default="rf", help="Model type: rf, mvmoe, mtpomo"
+    )
+    parser.add_argument("--experiment", type=str, default="all")
+    parser.add_argument(
+        "--checkpoint", type=str, default="checkpoints/100/rf-transformer.ckpt"
+    )
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--num_runs", type=int, default=3)
 
     args = parser.parse_args()
 
-    for exp in [
-        "eal",
-        "reinit",
-        "reinit_embeddings",
-        "no_adapter",
-        "init_embed_freeze_backbone",
-    ]:
+    if args.experiment == "all":
+        exps = [
+            "eal-full",
+            "eal-adapter",
+            "al-full",
+            "al-adapter",
+            "scratch",
+        ]
+    else:
+        exps = [args.experiment]
+
+    for exp in exps:
         print(f"Training for {exp}")
         for i in range(args.num_runs):
-            print(f"Trial {i+1}/{args.num_runs}")
-            main(args.path, args.model_type, exp, args.lr)
+            print(f"Run {i+1}/{args.num_runs}")
+            main(args.checkpoint, args.model_type, exp, args.lr)
