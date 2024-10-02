@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "routefinder"
-version = "0.1.0"
+version = "0.2.0"
 description = "Towards Foundation Models for Vehicle Routing Problems"
 authors = [
     "Federico Berto <berto.federico2@gmail.com>",
@@ -20,13 +20,8 @@ readme = "README.md"
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
-rl4co = { git = "https://github.com/ai4co/rl4co.git", branch = "main" }
-pytest = { version = "^6.2.5", optional = true }
-pytest-cov = { version = "^3.0.0", optional = true }
-black = { version = "^23.3.0", optional = true }
-ruff = { version = "^0.1.6", optional = true }
-pre-commit = { version = "^3.3.3", optional = true }
+python = ">=3.9"
+rl4co = { git = "https://github.com/ai4co/rl4co.git", branch = "main", extras = ["dev"] }
 pyvrp = { version = "^0.9.1", optional = true }
 ortools = { version = "^9.10.4067", optional = true }
 
