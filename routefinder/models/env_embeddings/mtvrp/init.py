@@ -103,14 +103,26 @@ class MTVRPInitEmbeddingRouteFinderBase(nn.Module):
         return torch.cat((global_embeddings, cust_embeddings), -2)
 
 
-class MTVRPInitEmbeddingGlobalNoPolar(MTVRPInitEmbeddingRouteFinderBase):
+class MTVRPInitEmbeddingRouteFinder(MTVRPInitEmbeddingRouteFinderBase):
     """
-    Also global embedding, but without polar coordinates. Here we also project the depot position.
+    Customer features:
+        - locs: x, y euclidean coordinates
+        - demand_linehaul: demand of the nodes (delivery) (C)
+        - demand_backhaul: demand of the nodes (pickup) (B)
+        - time_windows: time window (TW)
+        - service_time: service time of the nodes
+    Global features:
+        - open_route (O)
+        - distance_limit (L)
+        - (end) time window of depot
+        - x, y euclidean coordinates of depot
+    The above features are embedded in the depot node as global and get broadcasted via attention.
+    This allows the network to learn the relationships between them.
     """
 
     def __init__(self, embed_dim=128, bias=False, posinf_val=0.0):
-        super(MTVRPInitEmbeddingGlobalNoPolar, self).__init__(
-            num_global_feats=4,
+        super(MTVRPInitEmbeddingRouteFinder, self).__init__(
+            num_global_feats=5,  # x, y, open_route, distance_limit, time_window_depot
             num_cust_feats=7,
             embed_dim=embed_dim,
             bias=bias,
@@ -123,6 +135,7 @@ class MTVRPInitEmbeddingGlobalNoPolar(MTVRPInitEmbeddingRouteFinderBase):
                 td["open_route"].float()[..., None],
                 td["locs"][:, :1, :],
                 td["distance_limit"][..., None],
+                td["time_windows"][:, :1, 1:2],
             ],
             -1,
         )
@@ -140,108 +153,19 @@ class MTVRPInitEmbeddingGlobalNoPolar(MTVRPInitEmbeddingRouteFinderBase):
         )
 
 
-## NOTE: we should use *this*!
-class MTVRPInitEmbeddingGlobalPolar(MTVRPInitEmbeddingRouteFinderBase):
-    """This version transforms to polar coordinates first and also uses our global embedding features.
-    Global features:
-        - open_route (O)
-        - distance_limit (L)
-    The above features are embedded in the depot node as global and get broadcasted via attention.
-    This allows the network to learn the relationships between them.
-
-    Note that we don't include the depot position here since it is always 0! (centered) because of our transformation to polar coordinates.
-    """
-
+class MTVRPInitEmbeddingM(MTVRPInitEmbeddingRouteFinder):
     def __init__(self, embed_dim=128, bias=False, posinf_val=0.0):
-        super(MTVRPInitEmbeddingGlobalPolar, self).__init__(
-            num_global_feats=2,
-            num_cust_feats=9,
-            embed_dim=embed_dim,
-            bias=bias,
-            posinf_val=posinf_val,
-        )
-
-    def _global_feats(self, td):
-        return torch.cat(
-            [
-                td["open_route"].float()[..., None],
-                td["distance_limit"][..., None],
-            ],
-            -1,
-        )
-
-    def _cust_feats(self, td):
-        locs = td["locs"]
-        depot = locs[:, 0:1, :]
-        locs = locs - depot  # centering
-
-        dist_to_depot = torch.norm(locs - depot, p=2, dim=-1, keepdim=True)
-        angle_to_depot = torch.atan2(locs[..., 1:], locs[..., :1])
-
-        return torch.cat(
-            (
-                dist_to_depot[..., 1:, :],
-                angle_to_depot[..., 1:, :],
-                td["demand_linehaul"][..., 1:, None],
-                td["demand_backhaul"][..., 1:, None],
-                td["time_windows"][..., 1:, :],
-                td["service_time"][..., 1:, None],
-                locs[:, 1:, :],
-            ),
-            -1,
-        )
-
-
-class MTVRPInitEmbeddingRouteFinder(MTVRPInitEmbeddingGlobalPolar):
-    def __init__(self, *args, **kwargs):
-        super(MTVRPInitEmbeddingRouteFinder, self).__init__(*args, **kwargs)
-
-
-# Simple ablation without the location features
-class MTVRPInitEmbeddingGlobalPolarOnly(MTVRPInitEmbeddingGlobalPolar):
-    def __init__(self, embed_dim=128, bias=False, posinf_val=0.0):
-        super(MTVRPInitEmbeddingGlobalPolar, self).__init__(
-            num_global_feats=2,
+        # Note: here we add the backhaul_class as a feature
+        MTVRPInitEmbeddingRouteFinderBase.__init__(
+            self,
+            num_global_feats=5 + 1,
             num_cust_feats=7,
             embed_dim=embed_dim,
             bias=bias,
             posinf_val=posinf_val,
         )
 
-    def _cust_feats(self, td):
-        locs = td["locs"]
-        depot = locs[:, 0:1, :]
-        locs = locs - depot  # centering
-
-        dist_to_depot = torch.norm(locs - depot, p=2, dim=-1, keepdim=True)
-        angle_to_depot = torch.atan2(locs[..., 1:], locs[..., :1])
-
-        return torch.cat(
-            (
-                dist_to_depot[..., 1:, :],
-                angle_to_depot[..., 1:, :],
-                td["demand_linehaul"][..., 1:, None],
-                td["demand_backhaul"][..., 1:, None],
-                td["time_windows"][..., 1:, :],
-                td["service_time"][..., 1:, None],
-            ),
-            -1,
-        )
-
-
-class ZeroShotInitEmbedding(MTVRPInitEmbeddingRouteFinder):
-    def __init__(self, embed_dim=128, bias=False, posinf_val=0.0):
-        # Note: here we add the backhaul_class as a feature
-        MTVRPInitEmbeddingRouteFinderBase.__init__(
-            self,
-            num_global_feats=3,
-            num_cust_feats=9,
-            embed_dim=embed_dim,
-            bias=bias,
-            posinf_val=posinf_val,
-        )
-
     def _global_feats(self, td):
-        glob_feats = super(ZeroShotInitEmbedding, self)._global_feats(td)
+        glob_feats = super(MTVRPInitEmbeddingM, self)._global_feats(td)
         is_mixed_backhaul = (td["backhaul_class"] == 2).float()
         return torch.cat([glob_feats, is_mixed_backhaul[..., None]], -1)

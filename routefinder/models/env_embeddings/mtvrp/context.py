@@ -37,6 +37,9 @@ class MTVRPContextEmbedding(EnvContext):
     - used capacity
     - open route
     - remaining distance (set to default_remain_dist if positive infinity)
+
+    Note that the distance limit (L) and open routes (O) are only embedding during decoding
+    in this version
     """
 
     def __init__(self, embed_dim=128, default_remain_dist=10):
@@ -72,6 +75,8 @@ class RouteFinderContextEmbedding(EnvContext):
     - current time
     - used capacity
     - remaining distance (set to default_remain_dist if positive infinity)
+
+    We do not need to embed the open route here since it is done encoder-side.
     """
 
     def __init__(self, embed_dim=128, default_remain_dist=10):
@@ -108,8 +113,8 @@ class MTVRPContextEmbeddingRouteFinder(RouteFinderContextEmbedding):
         super(MTVRPContextEmbeddingRouteFinder, self).__init__(*args, **kwargs)
 
 
-class ZeroShotContextEmbedding(MTVRPContextEmbeddingRouteFinder):
-    """Context embedding MTVRP.
+class MTVRPContextEmbeddingM(MTVRPContextEmbeddingRouteFinder):
+    """Context embedding MTVRP with mixed backhaul.
     This is for the zero-shot or few-short on backhaul_class 2 instances.
     - current time
     - used capacity
@@ -121,7 +126,7 @@ class ZeroShotContextEmbedding(MTVRPContextEmbeddingRouteFinder):
         self.default_remain_dist = default_remain_dist
 
     def _state_embedding(self, embeddings, td):
-        context_feats = super(ZeroShotContextEmbedding, self)._state_embedding(
+        context_feats = super(MTVRPContextEmbeddingM, self)._state_embedding(
             embeddings, td
         )
         # this will be 0 and tell the model we are *not* doing VRPMPD if backhaul class is not 2
