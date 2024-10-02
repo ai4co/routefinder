@@ -2,7 +2,7 @@
 
 # Override defaults by taking another config
 defaults:
-  - rfbase-100.yaml
+  - rfbase-50.yaml
   - _self_
 
 env:
@@ -21,12 +21,12 @@ model:
     context_embedding:
       _target_: routefinder.models.env_embeddings.mtvrp.context.MTVRPContextEmbeddingRouteFinder
       embed_dim: ${model.policy.embed_dim}
-    hierarchical_gating: True  # if True, corresponds to MVMoE-L
+    hierarchical_gating: False  # if True, corresponds to MVMoE-L
 
 # Logging: we use Wandb in this case
 logger:
   wandb:
     tags: ["rf", "moe", "${env.name}"]
     group: "${env.generator_params.num_loc}-${env.name}"
-    name: "rf-moe-L-${env.generator_params.num_loc}-main"
+    name: "rf-moe-${env.generator_params.num_loc}-main"
     project: "routefinder-main"

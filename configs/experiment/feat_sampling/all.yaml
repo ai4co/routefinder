@@ -7,7 +7,6 @@ defaults:
 
 model:
   _target_: routefinder.models.model.RouteFinderSingleVariantSampling
-  preset: "all"
 
 env:
   generator_params:
@@ -19,4 +18,4 @@ logger:
     project: "routefinder"
     tags: ["rf", "${env.name}"]
     group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
-    name: "rf-${env.generator_params.variant_preset}-single_feat_sampling"
+    name: "rf-single_feat_sampling"

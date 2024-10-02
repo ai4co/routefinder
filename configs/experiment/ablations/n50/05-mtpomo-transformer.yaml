@@ -1,0 +1,30 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - ablations/base.yaml
+  - main/mtpomo/mtpomo-50.yaml
+  - _self_
+
+model:
+  policy:
+    init_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.init.MTVRPInitEmbedding
+      embed_dim: ${model.policy.embed_dim}
+    context_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.context.MTVRPContextEmbedding
+      embed_dim: ${model.policy.embed_dim}
+    # transformer part
+    _target_: routefinder.models.policy.RouteFinderPolicy
+    normalization: "rms"
+    encoder_use_prenorm: True
+    encoder_use_post_layers_norm: True
+    parallel_gated_kwargs:
+      mlp_activation: "silu"
+
+logger:
+  wandb:
+    name: "05-mtpomo_transf-n${env.generator_params.num_loc}-seed${seed}"
+    group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
+    tags: ["mtpomo", "transformer", "${env.name}", "${model.policy.normalization}", "encoder_use_prenorm-${model.policy.encoder_use_prenorm}", "encoder_use_post_layers_norm-${model.policy.encoder_use_post_layers_norm}", "parallel_gated_kwargs-${model.policy.parallel_gated_kwargs.mlp_activation}"]
+    project: "routefinder-ablations"

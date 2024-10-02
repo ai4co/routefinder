@@ -7,6 +7,7 @@
 
 # Override defaults: take configs from relative path
 defaults:
+  - _self_
   - override /model: routefinder.yaml
   - override /env: mtvrp.yaml
   - override /callbacks: default.yaml
@@ -18,8 +19,8 @@ seed: 69420
 
 env:
   generator_params:
-    num_loc: 50
     variant_preset: "all" # NOTE: original is "single_feat", but we use all in our setting
+    subsample: True
 
   val_file: [cvrp/val/50.npz, ovrp/val/50.npz, ovrpb/val/50.npz, ovrpbl/val/50.npz,
              ovrpbltw/val/50.npz, ovrpbtw/val/50.npz, ovrpl/val/50.npz, ovrpltw/val/50.npz,
@@ -32,7 +33,7 @@ env:
                          ovrpbltw50, ovrpbtw50, ovrpl50, ovrpltw50,
                          ovrptw50, vrpb50, vrpl50, vrpbltw50,
                          vrpbtw50, vrpbl50, vrpltw50, vrptw50,
-                         cvrp100, vrptw100,]
+                         cvrp100, vrptw100]
 
   test_file: [cvrp/test/50.npz, ovrp/test/50.npz, ovrpb/test/50.npz, ovrpbl/test/50.npz,
               ovrpbltw/test/50.npz, ovrpbtw/test/50.npz, ovrpl/test/50.npz, ovrpltw/test/50.npz,
@@ -47,10 +48,7 @@ env:
 # Logging: we use Wandb in this case
 logger:
   wandb:
-    project: "routefinder"
-    tags: ["rfbase", "${env.name}"]
-    group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
-    name: "rfbase"
+    project: "routefinder-ablations"
 
 # Note that we use 100k per epoch, so total is 1000 epochs instead of 10k
 # However, due to resource constraints (and time), we consider training to 100 epochs
@@ -72,9 +70,9 @@ model:
   lr_scheduler_kwargs:
     milestones: [270, 295]
     gamma: 0.1
-  normalize_reward: "exponential"
-  norm_operation: "div"
-  alpha: 0.25
+  normalize_reward: "none"
+  policy:
+    embed_dim: 128
 
 trainer:
   # max_epochs: 1000 (full run as per the paper)
@@ -84,4 +82,3 @@ trainer:
 callbacks:
   model_checkpoint:
     dirpath: logs/${logger.wandb.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}/checkpoints
-    monitor: "val/reward/cvrp50"

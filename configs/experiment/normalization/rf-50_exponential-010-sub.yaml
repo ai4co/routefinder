@@ -1,0 +1,26 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - rfbase-50_norm.yaml
+  - _self_
+
+env:
+  generator_params:
+    variant_preset: "all"
+
+model:
+  _target_: routefinder.models.model.RouteFinderBase
+  normalize_reward: "exponential"
+  norm_operation: "sub"
+  alpha: 0.10
+  policy:
+    _target_: routefinder.models.policy.RouteFinderPolicy
+
+# Logging: we use Wandb in this case
+logger:
+  wandb:
+    project: "routefinder"
+    tags: ["rf", "${env.name}", "reward_normalization", "${model.normalize_reward}", "${model.norm_operation}", "alpha-${model.alpha}"]
+    group: "${env.generator_params.num_loc}-${env.name}"${model.alpha}
+    name: "rf-norm"

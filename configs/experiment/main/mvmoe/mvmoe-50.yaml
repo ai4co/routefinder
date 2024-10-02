@@ -12,24 +12,18 @@ env:
 
 model:
   _target_: routefinder.models.baselines.mvmoe.model.MVMoE
-  preset: all # for feature selection
   test_batch_size: ${model.val_batch_size}
   policy:
     _target_: routefinder.models.baselines.mvmoe.policy.MVMoEPolicy
     hierarchical_gating: False  # if True, corresponds to MVMoE-L
+  normalize_reward: "none"
 
 # Logging: we use Wandb in this case
 logger:
   wandb:
-    project: "routefinder"
     tags: ["mvmoe", "${env.name}", "sfs"]
     group: "${env.generator_params.num_loc}-${env.name}"
-    name: "mvmoe-${model.preset}"
-
-# Easier default under logs/ directory
-callbacks:
-  model_checkpoint:
-    dirpath: logs/${logger.wandb.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}/checkpoints
-    monitor: "val/reward/cvrp100"
+    name: "mvmoe-${env.generator_params.num_loc}-main"
+    project: "routefinder-main"
 
 

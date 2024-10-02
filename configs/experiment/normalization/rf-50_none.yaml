@@ -2,7 +2,7 @@
 
 # Override defaults by taking another config
 defaults:
-  - rfbase-50.yaml
+  - rfbase-50_norm.yaml
   - _self_
 
 env:
@@ -13,11 +13,12 @@ model:
   _target_: routefinder.models.model.RouteFinderBase
   policy:
     _target_: routefinder.models.policy.RouteFinderPolicy
+  normalize_reward: "none"
 
 # Logging: we use Wandb in this case
 logger:
   wandb:
-    tags: ["rf", "${env.name}"]
+    project: "routefinder"
+    tags: ["rf", "${env.name}", "reward_normalization", "${model.normalize_reward}", "div", "sub"] # applies for comparison with both div and sub
     group: "${env.generator_params.num_loc}-${env.name}"
-    name: "rf-${env.generator_params.num_loc}-main"
-    project: "routefinder-main"
+    name: "rf-norm"

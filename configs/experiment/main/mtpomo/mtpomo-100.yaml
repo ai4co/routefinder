@@ -2,7 +2,7 @@
 
 # Override defaults by taking another config
 defaults:
-  - rfbase-100.yaml
+  - /experiment/rfbase-100.yaml
   - _self_
 
 env:
@@ -12,23 +12,18 @@ env:
 
 model:
   _target_: routefinder.models.baselines.mtpomo.MTPOMO
-  preset: "all"
   # Policy (neural network) section
   policy:
     _target_: routefinder.models.baselines.mtpomo.MTPOMOPolicy
+  normalize_reward: "none"
 
 # Logging: we use Wandb in this case
 logger:
   wandb:
-    project: "routefinder"
     tags: ["mtpomo", "${env.name}", "sfs"]
     group: "${env.generator_params.num_loc}-${env.name}"
-    name: "mtpomo-${model.preset}"
+    name: "mtpomo-${env.generator_params.num_loc}-main"
+    project: "routefinder-main"
 
-# Easier default under logs/ directory
-callbacks:
-  model_checkpoint:
-    dirpath: logs/${logger.wandb.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}/checkpoints
-    monitor: "val/reward/cvrp100"
 
 

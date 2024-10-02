@@ -25,7 +25,7 @@ env:
               ovrpbltw/val/100.npz, ovrpbtw/val/100.npz, ovrpl/val/100.npz, ovrpltw/val/100.npz,
               ovrptw/val/100.npz, vrpb/val/100.npz, vrpl/val/100.npz, vrpbltw/val/100.npz,
               vrpbtw/val/100.npz, vrpbl/val/100.npz, vrpltw/val/100.npz, vrptw/val/100.npz,
-              cvrp/val/50.npz, vrptw/val/50.npz, cvrp/val/200.npz, vrptw/val/200.npz, # generalization
+              cvrp/val/50.npz, vrptw/val/50.npz, # generalization
   ]
 
 
@@ -33,13 +33,13 @@ env:
                           ovrpbltw100, ovrpbtw100, ovrpl100, ovrpltw100,
                           ovrptw100, vrpb100, vrpl100, vrpbltw100,
                           vrpbtw100, vrpbl100, vrpltw100, vrptw100,
-                          cvrp50, vrptw50, cvrp200, vrptw200]
+                          cvrp50, vrptw50,]
 
   test_file: [cvrp/test/100.npz, ovrp/test/100.npz, ovrpb/test/100.npz, ovrpbl/test/100.npz,
               ovrpbltw/test/100.npz, ovrpbtw/test/100.npz, ovrpl/test/100.npz, ovrpltw/test/100.npz,
               ovrptw/test/100.npz, vrpb/test/100.npz, vrpl/test/100.npz, vrpbltw/test/100.npz,
               vrpbtw/test/100.npz, vrpbl/test/100.npz, vrpltw/test/100.npz, vrptw/test/100.npz,
-              cvrp/test/50.npz, vrptw/test/50.npz, cvrp/test/200.npz, vrptw/test/200.npz, # generalization
+              cvrp/test/50.npz, vrptw/test/50.npz, # generalization
   ]
 
   test_dataloader_names: ${env.val_dataloader_names}
@@ -51,7 +51,7 @@ logger:
     project: "routefinder"
     tags: ["rfbase", "${env.name}"]
     group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
-    name: "rfbase-${env.generator_params.variant_preset}"
+    name: "rfbase"
 
 # Note that we use 100k per epoch, so total is 1000 epochs instead of 10k
 # However, due to resource constraints (and time), we consider training to 100 epochs
@@ -73,6 +73,9 @@ model:
   lr_scheduler_kwargs:
     milestones: [270, 295]
     gamma: 0.1
+  normalize_reward: "exponential"
+  norm_operation: "div"
+  alpha: 0.25
 
 trainer:
   # max_epochs: 1000 (full run as per the paper)

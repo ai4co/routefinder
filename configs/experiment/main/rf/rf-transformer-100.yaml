@@ -2,7 +2,7 @@
 
 # Override defaults by taking another config
 defaults:
-  - rfbase-50.yaml
+  - /experiment/rfbase-100.yaml
   - _self_
 
 env:
@@ -13,11 +13,16 @@ model:
   _target_: routefinder.models.model.RouteFinderBase
   policy:
     _target_: routefinder.models.policy.RouteFinderPolicy
+    normalization: "rms"
+    encoder_use_prenorm: True
+    encoder_use_post_layers_norm: True
+    parallel_gated_kwargs:
+      mlp_activation: "silu"
 
 # Logging: we use Wandb in this case
 logger:
   wandb:
     tags: ["rf", "${env.name}"]
     group: "${env.generator_params.num_loc}-${env.name}"
-    name: "rf-${env.generator_params.num_loc}-main"
+    name: "rf-transformer-${env.generator_params.num_loc}-main"
     project: "routefinder-main"

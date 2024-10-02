@@ -1,0 +1,31 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - ablations/base.yaml
+  - main/rf/rf-transformer-100.yaml
+  - _self_
+
+env:
+  generator_params:
+    subsample: False
+
+model:
+  _target_: routefinder.models.model.RouteFinderSingleVariantSampling
+  normalize_reward: "exponential"
+  norm_operation: "div"
+  alpha: 0.25
+  policy:
+    init_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.init.MTVRPInitEmbeddingRouteFinder
+      embed_dim: ${model.policy.embed_dim}
+    context_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.context.MTVRPContextEmbeddingRouteFinder
+      embed_dim: ${model.policy.embed_dim}
+
+logger:
+  wandb:
+    name: "08-rf_no_mbt-n${env.generator_params.num_loc}-seed${seed}"
+    group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
+    tags: ["rf", "transformer", "${env.name}", "${model.normalize_reward}", "${model.norm_operation}", "alpha-${model.alpha}", "${model.policy.normalization}", "encoder_use_prenorm-${model.policy.encoder_use_prenorm}", "encoder_use_post_layers_norm-${model.policy.encoder_use_post_layers_norm}", "parallel_gated_kwargs-${model.policy.parallel_gated_kwargs.mlp_activation}"]
+    project: "routefinder-ablations"

@@ -30,7 +30,7 @@ logger:
     project: "routefinder"
     tags: ["rf", "${env.name}", "${env.generator_params.variant_preset}"]
     group: "${env.generator_params.num_loc}-${env.name}"
-    name: "rf-${env.generator_params.variant_preset}"
+    name: "rf"
 
 # Easier default under logs/ directory
 callbacks:

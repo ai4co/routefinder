@@ -32,7 +32,7 @@ env:
                          ovrpbltw50, ovrpbtw50, ovrpl50, ovrpltw50,
                          ovrptw50, vrpb50, vrpl50, vrpbltw50,
                          vrpbtw50, vrpbl50, vrpltw50, vrptw50,
-                         cvrp100, vrptw100,]
+                         cvrp100, vrptw100]
 
   test_file: [cvrp/test/50.npz, ovrp/test/50.npz, ovrpb/test/50.npz, ovrpbl/test/50.npz,
               ovrpbltw/test/50.npz, ovrpbtw/test/50.npz, ovrpl/test/50.npz, ovrpltw/test/50.npz,
@@ -72,9 +72,6 @@ model:
   lr_scheduler_kwargs:
     milestones: [270, 295]
     gamma: 0.1
-  normalize_reward: "exponential"
-  norm_operation: "div"
-  alpha: 0.25
 
 trainer:
   # max_epochs: 1000 (full run as per the paper)

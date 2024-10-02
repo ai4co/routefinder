@@ -1,0 +1,23 @@
+# @package _global_
+
+# Override defaults by taking another config
+defaults:
+  - ablations/base.yaml
+  - main/mtpomo/mtpomo-100.yaml
+  - _self_
+
+model:
+  policy:
+    init_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.init.MTVRPInitEmbeddingRouteFinder
+      embed_dim: ${model.policy.embed_dim}
+    context_embedding:
+      _target_: routefinder.models.env_embeddings.mtvrp.context.MTVRPContextEmbeddingRouteFinder
+      embed_dim: ${model.policy.embed_dim}
+
+logger:
+  wandb:
+    name: "02-mtpomo_globfeat-n${env.generator_params.num_loc}-seed${seed}"
+    group: "${env.generator_params.variant_preset}-${env.generator_params.num_loc}"
+    tags: ["mtpomo", "${env.name}"]
+    project: "routefinder-ablations"

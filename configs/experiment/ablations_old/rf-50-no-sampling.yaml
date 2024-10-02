@@ -2,7 +2,7 @@
 
 # Override defaults by taking another config
 defaults:
-  - rfbase-100.yaml
+  - rfbase-50.yaml
   - _self_
 
 env:
@@ -12,7 +12,6 @@ env:
 
 model:
   _target_: routefinder.models.model.RouteFinderSingleVariantSampling
-  preset: "all"
   policy:
     _target_: rl4co.models.zoo.am.AttentionModelPolicy
     embed_dim: 128

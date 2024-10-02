@@ -59,7 +59,7 @@ model:
   generate_default_data: False
   # metrics to be logged
   metrics:
-    train: ["loss", "reward"]
-    val: ["reward", "max_reward", "max_aug_reward"]
+    train: ["loss", "reward", "norm_reward", "norm_vals"]
+    val: ["reward", "max_reward", "max_aug_reward", "norm_reward", "gap_to_bks"]
     test: ${.val}
     log_on_step: True
