@@ -6,23 +6,16 @@
 _Towards Foundation Models for Vehicle Routing Problems_
 
 
-<table align="center">
-  <tr>
-    <td>
-      <div align="center">
-        <em>News: RouteFinder has been accepted as an <b>Oral</b> presentatation at the <a href="https://icml-fm-wild.github.io/"> ICML 2024 FM-Wild Workshop </a>! <a href="https://github.com/ai4co"> <img src="https://raw.githubusercontent.com/ai4co/assets/main/svg/ai4co_animated.svg" alt="AI4CO Logo" style="height: 1em; vertical-align: middle; transform: translateY(-20%);"> </a></em>
-      </div>
-    </td>
-  </tr>
-</table>
-
-
-
 ---
 
 <div align="center">
     <img src="assets/overview.png" alt="RouteFinder Overview" style="width: 100%; height: auto;">
 </div>
+
+
+## 📰 News 
+- Oct 2024: The latest version of RouteFinder has been released! We have added the latest contributions from our preprint and much improved codebase
+- Jul 2024: RouteFinder has been accepted as an **Oral** presentatation at the [ICML 2024 FM-Wild Workshop](https://icml-fm-wild.github.io/)!
 
 
 ## 🚀 Installation
