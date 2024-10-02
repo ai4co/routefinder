@@ -10,6 +10,9 @@ from torch import Tensor
 from .constants import PYVRP_SCALING_FACTOR
 from .utils import scale
 
+# TODO: check. This works for now
+MAX_VALUE = 1 << 42  # noqa: F811
+
 
 def solve(instance: TensorDict, max_runtime: float, **kwargs) -> tuple[Tensor, Tensor]:
     """

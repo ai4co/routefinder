@@ -102,7 +102,7 @@ def instance2data(instance: TensorDict) -> ORToolsData:
     backhauls = [0] + [client.pickup for client in data.clients()]
     service = [0] + [client.service_duration for client in data.clients()]
 
-    tws = [[data.location(0).tw_early, data.location(0).tw_late]]
+    tws = [[data.vehicle_type(0).tw_early, data.vehicle_type(0).tw_late]]
     tws += [[client.tw_early, client.tw_late] for client in data.clients()]
 
     # Set data to None if instance does not contain explicit values.
@@ -113,7 +113,7 @@ def instance2data(instance: TensorDict) -> ORToolsData:
     if all(val == 0 for val in backhauls):
         backhauls = None  # type: ignore
 
-    distances = data.distance_matrix().copy()
+    distances = data.distance_matrices()[0].copy()
     durations = np.array(distances) + np.array(service)[:, np.newaxis]
 
     if backhauls is not None:
