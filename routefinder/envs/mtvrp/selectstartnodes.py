@@ -8,8 +8,6 @@ def get_select_start_nodes_fn(select_start_nodes, **kwargs):
         return RandomStartNodes(**kwargs)
     elif select_start_nodes == "all":  # default from POMO
         return AllSelectStartNodes(**kwargs)
-    elif select_start_nodes == "smart":
-        return SmartSelectStartNodes(**kwargs)
     else:
         raise ValueError(f"Unknown select_start_nodes: {select_start_nodes}")
 
@@ -50,39 +48,3 @@ class AllSelectStartNodes(SelectStartNodes):
             + 1
         )
         return selected
-
-
-class SmartSelectStartNodes(SelectStartNodes):
-    def __init__(
-        self,
-        num_starts=None,
-        num_nearest=20,
-        exclude_backhauls=True,
-    ):
-        self.num_nearest = num_nearest
-        self.exclude_backhauls = exclude_backhauls
-        super().__init__(num_starts)
-
-    def _select(self, td, num_starts):
-        """let's select as starting nodes all nodes in a `top_k` closest neighborhood
-        of the depot of **linehaul customers only**
-        """
-        # compute distance from depot to all customers
-        d_0i = torch.cdist(td["locs"][:, 0:1, :], td["locs"][:, 1:, :], p=2)
-
-        # set to a high value the distance to backhauls
-        if self.exclude_backhauls:
-            is_backhaul = td["demand_backhaul"][:, 1:] > 0
-            d_0i[is_backhaul[:, None]] += 1e6
-
-        # get top k closest customers
-        # flatten for [B, num_starts] -> [B*num_starts]
-        selected = (
-            torch.topk(d_0i, self.num_nearest, largest=False).indices.flatten(0) + 1
-        )  # depot idx
-
-        # select starting nodes
-        return selected
-
-    def get_num_starts(self, td):
-        return self.num_nearest

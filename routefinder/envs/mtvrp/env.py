@@ -1,7 +1,11 @@
+import os
+
 from typing import List, Optional, Union
 
+import numpy as np
 import torch
 
+from rl4co.data.utils import load_npz_to_tensordict
 from rl4co.envs.common.base import RL4COEnvBase
 from rl4co.utils.ops import gather_by_index, get_distance
 from rl4co.utils.pylogger import get_pylogger
@@ -40,9 +44,9 @@ class MTVRPEnv(RL4COEnvBase):
     - *Duration Limits (L)*
         - Imposes a limit on the total travel duration (or length) of each route, ensuring a balanced workload across vehicles.
     - *Mixed (M) Backhaul (M)*
-        - This is a variant of the backhaul constraint where the vehicle can pick up and deliver linehaul customers in any order. 
+        - This is a variant of the backhaul constraint where the vehicle can pick up and deliver linehaul customers in any order.
         - However, we need to ensure that the vehicle has enough capacity to deliver the linehaul customers and that the vehicle can pick up backhaul customers only if it has enough capacity to deliver the linehaul customers.
-    
+
     The environment covers the following 16 variants depending on the data generation:
 
     +--------------++--------------+----------------+--------------+--------------------+------------------+
@@ -82,7 +86,7 @@ class MTVRPEnv(RL4COEnvBase):
     +--------------++--------------+----------------+--------------+--------------------+------------------+
 
     Additionally, with the mixed backhaul (M) variant, we obtain 24 variants.
-    
+
     You may also check out `"Multi-Task Learning for Routing Problem with Cross-Problem Zero-Shot Generalization" (Liu et al., 2024) <https://arxiv.org/abs/2402.16891>`_
     and `"MVMoE: Multi-Task Vehicle Routing Solver with Mixture-of-Experts" (Zhou et al, 2024) <https://arxiv.org/abs/2405.01029>`_.
 
@@ -102,7 +106,9 @@ class MTVRPEnv(RL4COEnvBase):
         generator: MTVRPGenerator = None,
         generator_params: dict = {},
         select_start_nodes_fn: Union[str, callable] = "all",
-        check_solution: bool = True,
+        check_solution: bool = False,
+        load_solutions: bool = True,
+        solution_fname: str = "_sol_pyvrp.npz",
         **kwargs,
     ):
         super().__init__(check_solution=check_solution, **kwargs)
@@ -120,6 +126,9 @@ class MTVRPEnv(RL4COEnvBase):
             self.select_start_nodes_fn = get_select_start_nodes_fn(select_start_nodes_fn)
         else:
             self.select_start_nodes_fn = select_start_nodes_fn
+
+        self.solution_fname = solution_fname
+        self.load_solutions = load_solutions
         self._make_spec(self.generator)
 
     def _step(self, td: TensorDict) -> TensorDict:
@@ -192,25 +201,60 @@ class MTVRPEnv(RL4COEnvBase):
         batch_size: Optional[list] = None,
     ) -> TensorDict:
         device = td.device
+
+        # Demands: linehaul (C) and backhaul (B). Backhaul defaults to 0
+        demand_linehaul = torch.cat(
+            [torch.zeros_like(td["demand_linehaul"][..., :1]), td["demand_linehaul"]],
+            dim=1,
+        )
+        demand_backhaul = td.get(
+            "demand_backhaul",
+            torch.zeros_like(td["demand_linehaul"]),
+        )
+        demand_backhaul = torch.cat(
+            [torch.zeros_like(td["demand_linehaul"][..., :1]), demand_backhaul], dim=1
+        )
+        # Backhaul class (MB). 1 is the default backhaul class
         backhaul_class = td.get(
             "backhaul_class",
             torch.full((*batch_size, 1), 1, dtype=torch.int32),
+        )
+
+        # Time windows (TW). Defaults to [0, inf] and service time to 0
+        time_windows = td.get("time_windows", None)
+        if time_windows is None:
+            time_windows = torch.zeros_like(td["locs"])
+            time_windows[..., 1] = float("inf")
+        service_time = td.get("service_time", torch.zeros_like(demand_linehaul))
+
+        # Open (O) route. Defaults to 0
+        open_route = td.get(
+            "open_route", torch.zeros_like(demand_linehaul[..., :1], dtype=torch.bool)
+        )
+
+        # Distance limit (L). Defaults to inf
+        distance_limit = td.get(
+            "distance_limit", torch.full_like(demand_linehaul[..., :1], float("inf"))
         )
 
         # Create reset TensorDict
         td_reset = TensorDict(
             {
                 "locs": td["locs"],
-                "demand_backhaul": td["demand_backhaul"],
-                "demand_linehaul": td["demand_linehaul"],
+                "demand_backhaul": demand_backhaul,
+                "demand_linehaul": demand_linehaul,
                 "backhaul_class": backhaul_class,
-                "distance_limit": td["distance_limit"],
-                "service_time": td["service_time"],
-                "open_route": td["open_route"],
-                "time_windows": td["time_windows"],
-                "vehicle_capacity": td["vehicle_capacity"],
-                "capacity_original": td["capacity_original"],
-                "speed": td["speed"],
+                "distance_limit": distance_limit,
+                "service_time": service_time,
+                "open_route": open_route,
+                "time_windows": time_windows,
+                "speed": td.get("speed", torch.ones_like(demand_linehaul[..., :1])),
+                "vehicle_capacity": td.get(
+                    "vehicle_capacity", torch.ones_like(demand_linehaul[..., :1])
+                ),
+                "capacity_original": td.get(
+                    "capacity_original", torch.ones_like(demand_linehaul[..., :1])
+                ),
                 "current_node": torch.zeros(
                     (*batch_size,), dtype=torch.long, device=device
                 ),
@@ -565,3 +609,23 @@ class MTVRPEnv(RL4COEnvBase):
 
     def available_variants(self):
         return self.generator.available_variants()
+
+    def load_data(self, fpath, batch_size=[]):
+        """Dataset loading from file"""
+        td = load_npz_to_tensordict(fpath)
+        if self.load_solutions:
+            # Load solutions if they exist depending on the file name
+            solution_fpath = fpath.replace(".npz", self.solution_fname)
+            if os.path.exists(solution_fpath):
+                sol = np.load(solution_fpath)
+                sol_dict = {}
+                for key, value in sol.items():
+                    if isinstance(value, np.ndarray) and len(value.shape) > 0:
+                        if value.shape[0] == td.batch_size[0]:
+                            key = "costs_bks" if key == "costs" else key
+                            key = "actions_bks" if key == "actions" else key
+                            sol_dict[key] = torch.tensor(value)
+                td.update(sol_dict)
+            else:
+                log.warning(f"No solution file found at {solution_fpath}")
+        return td

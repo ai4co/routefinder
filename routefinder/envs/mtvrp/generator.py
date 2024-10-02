@@ -92,7 +92,7 @@ class MTVRPGenerator(Generator):
         backhaul_ratio: float = 0.2,
         backhaul_class: int = 1,
         sample_backhaul_class: bool = False,
-        distance_limit: float = 3.0,
+        max_distance_limit: float = 2.8,  # 2sqrt(2) ~= 2.8
         speed: float = 1.0,
         prob_open: float = 0.5,
         prob_time_window: float = 0.5,
@@ -131,7 +131,7 @@ class MTVRPGenerator(Generator):
         self.sample_backhaul_class = sample_backhaul_class
 
         self.max_time = max_time
-        self.distance_limit = distance_limit
+        self.max_distance_limit = max_distance_limit
         self.speed = speed
 
         if variant_preset is not None:
@@ -172,13 +172,6 @@ class MTVRPGenerator(Generator):
         # linehaul demand / delivery (C) and backhaul / pickup demand (B)
         demand_linehaul, demand_backhaul = self.generate_demands(
             batch_size=batch_size, num_loc=self.num_loc
-        )
-        # add empty depot demands
-        demand_linehaul = torch.cat(
-            [torch.zeros(size=(*batch_size, 1)), demand_linehaul], dim=1
-        )
-        demand_backhaul = torch.cat(
-            [torch.zeros(size=(*batch_size, 1)), demand_backhaul], dim=1
         )
 
         backhaul_class = self.generate_backhaul_class(
@@ -224,7 +217,8 @@ class MTVRPGenerator(Generator):
 
         if self.subsample:
             # Subsample problems based on given instructions
-            return self.subsample_problems(td)
+            td = self.subsample_problems(td)
+            return td
         else:
             # Not subsampling problems, i.e. return tensordict with all attributes
             return td
@@ -305,7 +299,9 @@ class MTVRPGenerator(Generator):
     def _default_backhaul(td, remove):
         # by default, where there is a backhaul, linehaul is 0. therefore, we add backhaul to linehaul
         # and set backhaul to 0 where we want to remove backhaul
-        td["demand_linehaul"][remove] = td["demand_linehaul"][remove] + td["demand_backhaul"][remove]
+        td["demand_linehaul"][remove] = (
+            td["demand_linehaul"][remove] + td["demand_backhaul"][remove]
+        )
         td["demand_backhaul"][remove] = 0
         return td
 
@@ -330,26 +326,20 @@ class MTVRPGenerator(Generator):
             linehaul_demand: [B, N]
             backhaul_demand: [B, N]
         """
-        linehaul_demand = (
-            torch.FloatTensor(*batch_size, num_loc)
-            .uniform_(self.min_demand - 1, self.max_demand - 1)
-            .int()
-            + 1
-        ).float()
+        linehaul_demand = torch.FloatTensor(*batch_size, num_loc).uniform_(
+            self.min_demand - 1, self.max_demand - 1
+        )
+        linehaul_demand = (linehaul_demand.int() + 1).float()
         # Backhaul demand sampling
-        backhaul_demand = (
-            torch.FloatTensor(*batch_size, num_loc)
-            .uniform_(self.min_backhaul - 1, self.max_backhaul - 1)
-            .int()
-            + 1
-        ).float()
+        backhaul_demand = torch.FloatTensor(*batch_size, num_loc).uniform_(
+            self.min_backhaul - 1, self.max_backhaul - 1
+        )
+        backhaul_demand = (backhaul_demand.int() + 1).float()
         is_linehaul = torch.rand(*batch_size, num_loc) > self.backhaul_ratio
         backhaul_demand = (
             backhaul_demand * ~is_linehaul
         )  # keep only values where they are not linehauls
-        linehaul_demand = (
-            linehaul_demand * is_linehaul
-        )
+        linehaul_demand = linehaul_demand * is_linehaul
         return linehaul_demand, backhaul_demand
 
     def generate_time_windows(
@@ -399,18 +389,25 @@ class MTVRPGenerator(Generator):
     def generate_distance_limit(
         self, shape: Tuple[int, int], locs: torch.Tensor
     ) -> torch.Tensor:
-        """Generates distance limits (L) and checks their feasibilities.
+        """Generates distance limits (L).
+        The distance lower bound is dist_lower_bound = 2 * max(depot_to_location_distance),
+        then the max can be max_lim = min(max_distance_limit, dist_lower_bound + EPS). Ensures feasible yet challenging
+        constraints, with each instance having a unique, meaningful limit
 
         Returns:
             distance_limit: [B, 1]
         """
-        # calculate distance of all locations to depot
-        dist_to_depot = torch.cdist(locs, locs[:, 0:1, :], p=2)
-        assert (
-            (dist_to_depot * 2 < self.distance_limit)
-            | (self.distance_limit == 0)  # go back and forth
-        ).all(), "Distance limit too low, not all nodes can be reached from the depot."
-        return torch.full(shape, self.distance_limit, dtype=torch.float32)
+        max_dist = torch.max(torch.cdist(locs[:, 0:1], locs[:, 1:]).squeeze(-2), dim=1)[0]
+        dist_lower_bound = 2 * max_dist + 1e-6
+        max_distance_limit = torch.maximum(
+            torch.full_like(dist_lower_bound, self.max_distance_limit),
+            dist_lower_bound + 1e-6,
+        )
+
+        # We need to sample from the `distribution` module to get the same distribution with a tensor as input
+        return torch.distributions.Uniform(dist_lower_bound, max_distance_limit).sample()[
+            ..., None
+        ]
 
     def generate_open_route(self, shape: Tuple[int, int]):
         """Generate open route flags (O). Here we could have a sampler but we simply return True here so all

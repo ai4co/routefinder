@@ -36,9 +36,23 @@ def render(
     scale_demand = td["capacity_original"]
     demands_linehaul = td["demand_linehaul"] * scale_demand
     demands_backhaul = td["demand_backhaul"] * scale_demand
+
     # scale to closest integer
-    demands_linehaul = demands_linehaul.round().int()
-    demands_backhaul = demands_backhaul.round().int()
+    if demands_linehaul.max() <= 1:  # fallback for no scaling
+        # scale min value except 0 to 1 and max value to 9
+        demands_linehaul = (
+            (demands_linehaul - demands_linehaul.min())
+            / (demands_linehaul.max() - demands_linehaul.min())
+            * 9
+        )
+        demands_backhaul = (
+            (demands_backhaul - demands_backhaul.min())
+            / (demands_backhaul.max() - demands_backhaul.min())
+            * 9
+        )
+
+        demands_linehaul = demands_linehaul.round().int()
+        demands_backhaul = demands_backhaul.round().int()
 
     if actions is None:
         log.warning("No action in TensorDict, rendering unsorted locs")
