@@ -91,6 +91,8 @@ options:
 ```
 
 
+We also have a notebook to automatically download and test models on the CVRPLIB [here](examples/2.eval-cvrplib.ipynb)!
+
 
 ## 🔁 Reproducing Experiments
 
