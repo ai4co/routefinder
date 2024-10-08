@@ -26,7 +26,7 @@ Install the package in editable mode:
 pip install -e .
 ```
 
-If you would like to install all dependencies including optional solvers, please install using `pip install -e '.[dev,solver]'`.
+If you would like to install all dependencies including optional solvers, please install using `pip install -e '.[dev,solver]'`
 
 
 ## 🏁 Quickstart
