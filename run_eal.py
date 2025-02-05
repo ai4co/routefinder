@@ -1,7 +1,7 @@
-from copy import deepcopy
+import os
 
 import torch
-import torch.nn as nn
+import wandb
 
 from lightning.pytorch.callbacks import LearningRateMonitor, RichModelSummary
 from lightning.pytorch.loggers import WandbLogger
@@ -10,15 +10,15 @@ from rl4co.utils.callbacks.speed_monitor import SpeedMonitor
 # new model
 from rl4co.utils.trainer import RL4COTrainer
 
-import wandb
-
-from routefinder.envs import MTVRPEnv, MTVRPGenerator
+from routefinder.envs.mtdvrp import MTVRPEnv, MTVRPGenerator
 from routefinder.models.baselines.mvmoe.model import MVMoE
+from routefinder.models.env_embeddings.mtvrp.context import MTVRPContextEmbeddingFull
+from routefinder.models.env_embeddings.mtvrp.init import MTVRPInitEmbeddingFull
+from routefinder.models.finetuning.baselines import adapter_layers, model_from_scratch
+from routefinder.models.finetuning.eal import efficient_adapter_layers
 
 ## Normal training (note that we will actually just load a checkpoint)
 ## Zero shot (after training)
-from routefinder.models.env_embeddings.mtvrp.context import MTVRPContextEmbeddingM
-from routefinder.models.env_embeddings.mtvrp.init import MTVRPInitEmbeddingM
 from routefinder.models.model import (
     RouteFinderBase,
     RouteFinderMoE,
@@ -28,125 +28,44 @@ from routefinder.models.model import (
 # Load data into env
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-def freeze_backbone(policy):
-    # Freeze all the parameters in the model
-    for param in policy.parameters():
-        param.requires_grad = False
-    # Unfreeze embeddings
-    for param in policy.encoder.init_embedding.parameters():
-        param.requires_grad = True
-    for param in policy.decoder.context_embedding.parameters():
-        param.requires_grad = True
-    return policy
+# We have 3 different EAL settings: MB (mixed backhaul), MD (multi-depot), and both
+VARIANT_GEN_SETTINGS = {
+    "mb": {"backhaul_ratio": 0.3, "sample_backhaul_class": True, "num_depots": 1},
+    "md": {"backhaul_ratio": 0.2, "sample_backhaul_class": False, "num_depots": 3},
+    "both": {"backhaul_ratio": 0.3, "sample_backhaul_class": True, "num_depots": 3},
+}
 
 
-def model_from_scratch(model):
-    """Reinitializes from scratch with new model and new embeddings"""
-
-    print("Reinitializing full model from scratch")
-    embed_dim = model.policy.encoder.init_embedding.embed_dim
-
-    def reset_weights(m):
-        if isinstance(m, nn.Module) and hasattr(m, "reset_parameters"):
-            m.reset_parameters()
-
-    model.policy.apply(reset_weights)
-    model.policy.encoder.init_embedding = MTVRPInitEmbeddingM(embed_dim=embed_dim)
-    model.policy.decoder.context_embedding = MTVRPContextEmbeddingM(embed_dim=embed_dim)
-
-    # Add `_multistart` to decode type for train, val and test in policy
-    for phase in ["train", "val", "test"]:
-        model.set_decode_type_multistart(phase)
-
-    return model
-
-
-def adapter_layers(model, adapter_only=False):
-    """Adapter Layers (AL) from Lin et al., 2024.
-    Only initializes new adapter layers (embeddings), but keeps the model parameters the same.
-    """
-    print("Using Adapter Layers (AL)")
-
-    embed_dim = model.policy.encoder.init_embedding.embed_dim
-    policy = model.policy
-
-    new_init_embedding = MTVRPInitEmbeddingM(embed_dim=embed_dim)
-    new_context_embedding = MTVRPContextEmbeddingM(embed_dim=embed_dim)
-
-    policy.encoder.init_embedding = new_init_embedding
-    policy.decoder.context_embedding = new_context_embedding
-
-    # If not full, then we freeze the backbone
-    if adapter_only:
-        policy = freeze_backbone(policy)
-
-    model.policy = policy
-    return model
-
-
-def efficient_adapter_layers(model, adapter_only=False):
-    """Efficient Active Layers (ours).
-    Keep the model the same, replace the embeddings with
-    new zero-padded embeddings for unseen features
-    """
-
-    print("Using Efficient Adapter Layers (EAL)")
-
-    policy = model.policy
-    embed_dim = policy.decoder.context_embedding.embed_dim
-
-    policy_new = deepcopy(policy)
-
-    init_embedding_new_feat = MTVRPInitEmbeddingM(embed_dim=embed_dim)
-    context_embedding_new_feat = MTVRPContextEmbeddingM(embed_dim=embed_dim)
-
-    policy_new.encoder.init_embedding = init_embedding_new_feat
-    policy_new.decoder.context_embedding = context_embedding_new_feat
-
-    policy_new = policy_new.to(device)
-
-    # Now, let's initialize the parameters: Encoder
-    init_embedding_old = deepcopy(policy.encoder.init_embedding)
-
-    # The new init embedding only has a new column (last one). So we can pad that with 0
-    proj_glob_params_old = init_embedding_old.project_global_feats.weight.data
-    proj_glob_params_new = torch.cat(
-        [proj_glob_params_old, torch.zeros_like(proj_glob_params_old[:, :1])], dim=-1
-    )
-
-    init_embed_new = MTVRPInitEmbeddingM(embed_dim=embed_dim)
-    init_embed_new.project_global_feats.weight.data = proj_glob_params_new
-    init_embed_new.project_customers_feats.weight.data = (
-        init_embedding_old.project_customers_feats.weight.data
-    )
-
-    # Now, let's initialize the parameters: Decoder
-    context_embedding_old = deepcopy(policy.decoder.context_embedding)
-
-    # The new context embedding only has a new column (last one). So we can pad that with 0
-    proj_context_old = context_embedding_old.project_context.weight.data
-    proj_context_new = torch.cat(
-        [proj_context_old, torch.zeros_like(proj_context_old[:, :1])], dim=-1
-    )
-
-    context_embed_new = MTVRPContextEmbeddingM(embed_dim=embed_dim)
-    context_embed_new.project_context.weight.data = proj_context_new
-
-    # Replace above into the policy
-    policy_new.encoder.init_embedding = init_embed_new
-    policy_new.decoder.context_embedding = context_embed_new
-
-    # If not full, then we freeze the backbone
-    if adapter_only:
-        policy_new = freeze_backbone(policy_new)
-
-    model.policy = policy_new
-    return model
+def finetune_variant_names(variant_name):
+    # 3 cases: finetune_var = "mb", "md", "both"
+    variant_names = []
+    for root, dirs, files in os.walk("data"):
+        # get dir whose name contains "finetune_variant"
+        for dir in dirs:
+            if "md" not in dir and "mb" not in dir:
+                continue
+            if variant_name == "mb":
+                if "md" in dir:
+                    continue
+            elif variant_name == "md":
+                if "mb" in dir:
+                    continue
+            else:
+                if not ("mb" in dir and "md" in dir):
+                    continue
+            variant_names.append(dir)
+    return variant_names
 
 
 # Load checkpoint
-def main(path, model_type="rf", train_type="eal-full", lr=3e-4):
+def main(
+    path,
+    model_type="rf",
+    train_type="eal-full",
+    finetune_variant="mb",
+    lr=3e-4,
+    test_zero_shot=False,
+):
     if "rf" in model_type:
         if "moe" in model_type:
             model = RouteFinderMoE.load_from_checkpoint(path, map_location="cpu")
@@ -164,12 +83,28 @@ def main(path, model_type="rf", train_type="eal-full", lr=3e-4):
     model = model.to(device)
 
     if "eal" in train_type:
-        model = efficient_adapter_layers(model, adapter_only="adapter" in train_type)
+        model = efficient_adapter_layers(
+            model,
+            init_embedding_cls=MTVRPInitEmbeddingFull,
+            context_embedding_cls=MTVRPContextEmbeddingFull,
+            init_embedding_num_new_feats=1,
+            context_embedding_num_new_feats=3,
+            adapter_only="adapter" in train_type,
+        )
     # elif train_type == "al":
     elif "al" in train_type:
-        model = adapter_layers(model, adapter_only="adapter" in train_type)
+        model = adapter_layers(
+            model,
+            init_embedding_cls=MTVRPInitEmbeddingFull,
+            context_embedding_cls=MTVRPContextEmbeddingFull,
+            adapter_only="adapter" in train_type,
+        )
     elif train_type == "scratch":
-        model = model_from_scratch(model)
+        model = model_from_scratch(
+            model,
+            init_embedding_cls=MTVRPInitEmbeddingFull,
+            context_embedding_cls=MTVRPContextEmbeddingFull,
+        )
     else:
         raise ValueError(
             "Training type not recognized: {}. Choose from ['eal', 'al', 'scratch']".format(
@@ -177,57 +112,19 @@ def main(path, model_type="rf", train_type="eal-full", lr=3e-4):
             )
         )
 
-    # Set correct paths
-    dataloader_names = [
-        "cvrp100",
-        "ovrp100",
-        "ovrpb100",
-        "ovrpbl100",
-        "ovrpbltw100",
-        "ovrpbtw100",
-        "ovrpl100",
-        "ovrpltw100",
-        "ovrptw100",
-        "vrpb100",
-        "vrpl100",
-        "vrpbltw100",
-        "vrpbtw100",
-        "vrpbl100",
-        "vrpltw100",
-        "vrptw100",
-    ]
+    # Now, list all possible variant names in data/ which contain "finetune_variant" in their name
+    variant_names = finetune_variant_names(finetune_variant)
 
-    test_data = [
-        "cvrp/test/100.npz",
-        "ovrp/test/100.npz",
-        "ovrpb/test/100.npz",
-        "ovrpbl/test/100.npz",
-        "ovrpbltw/test/100.npz",
-        "ovrpbtw/test/100.npz",
-        "ovrpl/test/100.npz",
-        "ovrpltw/test/100.npz",
-        "ovrptw/test/100.npz",
-        "vrpb/test/100.npz",
-        "vrpl/test/100.npz",
-        "vrpbltw/test/100.npz",
-        "vrpbtw/test/100.npz",
-        "vrpbl/test/100.npz",
-        "vrpltw/test/100.npz",
-        "vrptw/test/100.npz",
-    ]
-
-    # Add the mixed backhaul variants
-    b_variants = [d for d in dataloader_names if "b" in d]
-    test_dataloader_names = dataloader_names + [d.replace("b", "mb") for d in b_variants]
-    test_data = test_data + [name.replace("b", "mb") for name in test_data if "b" in name]
-
+    # Prepare dataloader names and data
+    test_dataloader_names = [v + "100" for v in variant_names]
+    test_data = [f"{v}/test/100.npz" for v in variant_names]
     val_data = [name.replace("test", "val") for name in test_data]
     val_dataloader_names = test_dataloader_names
 
     # Create env: the new setting is with backhaul sampling (so we have the new MB variants)
     # and also we have slightly more backhauls
     generator = MTVRPGenerator(
-        num_loc=100, variant_preset="all", sample_backhaul_class=True, backhaul_ratio=0.3
+        num_loc=100, variant_preset="all", **VARIANT_GEN_SETTINGS[finetune_variant]
     )
 
     env = MTVRPEnv(
@@ -247,15 +144,16 @@ def main(path, model_type="rf", train_type="eal-full", lr=3e-4):
     model.env = env
     model.setup()
     model.data_cfg["batch_size"] = 128
-    model.data_cfg["val_batch_size"] = 1024
-    model.data_cfg["test_batch_size"] = 1024
+    model.data_cfg["val_batch_size"] = 256
+    model.data_cfg["test_batch_size"] = 256
     model.data_cfg["train_data_size"] = 10_000  # instead of 100k
 
     # Test model
     logger = WandbLogger(
-        project="routefinder-eal",
-        name=f"{model_type}-{train_type}-{lr}",
+        project=f"routefinder-eal-{finetune_variant}",
+        name=f"{model_type}-{train_type}",
         reinit=True,
+        tags=[model_type, train_type, finetune_variant, "final"],
     )
     rich_model_summary = RichModelSummary(max_depth=3)
     speed_monitor = SpeedMonitor(
@@ -272,11 +170,20 @@ def main(path, model_type="rf", train_type="eal-full", lr=3e-4):
         callbacks=[rich_model_summary, speed_monitor, lr_monitor],
     )
 
-    # Test zero-shot generalization reporting
+    # Validate and test zero-shot generalization reporting
     trainer.validate(model)
+    if test_zero_shot:
+        # TODO: ensure this does not overwrite the test results
+        print(
+            "Testing zero-shot generalization. Note that this will overwrite test results!"
+        )
+        trainer.test(model)
 
     # Main training loop
     trainer.fit(model)
+
+    # Test model
+    trainer.test(model)
 
     print("Finished training")
     wandb.finish()
@@ -289,7 +196,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_type", type=str, default="rf", help="Model type: rf, mvmoe, mtpomo"
     )
-    parser.add_argument("--experiment", type=str, default="all")
+    parser.add_argument("--experiment", type=str, default="all", help="Experiment type")
+    parser.add_argument(
+        "--variants_finetune", type=str, default="all", help="Variants to finetune on"
+    )
     parser.add_argument(
         "--checkpoint", type=str, default="checkpoints/100/rf-transformer.ckpt"
     )
@@ -298,19 +208,29 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # available_experiments = ["eal-full", "eal-adapter", "al-full", "al-adapter", "scratch"]
+    available_experiments = ["eal-full", "al-full", "scratch"]
     if args.experiment == "all":
-        exps = [
-            "eal-full",
-            "eal-adapter",
-            "al-full",
-            "al-adapter",
-            "scratch",
-        ]
+        exps = available_experiments
     else:
         exps = [args.experiment]
+        assert all(
+            [e in available_experiments for e in exps]
+        ), f"Invalid experiment: {exps}. Choose from {available_experiments}"
 
-    for exp in exps:
-        print(f"Training for {exp}")
-        for i in range(args.num_runs):
-            print(f"Run {i+1}/{args.num_runs}")
-            main(args.checkpoint, args.model_type, exp, args.lr)
+    available_variants = ["mb", "md", "both"]  # mixed backhaul, multi-depot, both
+    if args.variants_finetune == "all":
+        variants = available_variants
+    else:
+        variants = [args.variants_finetune]
+        assert all(
+            [v in available_variants for v in variants]
+        ), f"Invalid variant: {variants}. Choose from {available_variants}"
+
+    for finetune_variant in variants:
+        print(f"Finetuning on {finetune_variant} variants")
+        for exp in exps:
+            print(f"Training for {exp}")
+            for i in range(args.num_runs):
+                print(f"Run {i+1}/{args.num_runs}")
+                main(args.checkpoint, args.model_type, exp, finetune_variant, args.lr)
