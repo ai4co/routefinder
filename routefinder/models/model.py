@@ -270,7 +270,7 @@ class RouteFinderMoE(RouteFinderBase):
 
 
 class RouteFinderSingleVariantSampling(RouteFinderBase):
-    """This is the default sampling method for MVMoE and MTPOMO
+    """This is the default sampling method for MVMoE and MTPOMO.
     (without Mixed-Batch Training) as first proposed in MTPOMO (https://arxiv.org/abs/2402.16891)
 
     The environment generates by default all the features,
@@ -286,17 +286,14 @@ class RouteFinderSingleVariantSampling(RouteFinderBase):
         self,
         env: RL4COEnvBase,
         policy: nn.Module,
-        preset: str = "all",
+        preset=None,  # unused
         **kwargs,
     ):
         # assert that the env generator has all the features
         assert (
-            env.generator.variant_preset == "all"
+            env.generator.variant_preset == "all" or env.generator.variant_preset is None
         ), "The env generator must have all the features since we are sampling them"
-        assert preset in [
-            "all",
-        ], "preset must be all"
-        self.preset = preset
+
         assert (
             not env.generator.subsample
         ), "The env generator must not subsample the features, this is done in the `shared_step` method"
@@ -315,8 +312,9 @@ class RouteFinderSingleVariantSampling(RouteFinderBase):
         # variant subsampling: given a batch with *all* features, we subsample a part of them
         if phase == "train":
 
-            # Sample single variant (i.e which features to *remove* with 50% probability)
-            indices = torch.bernoulli(torch.tensor([0.5] * 4))
+            # Sample single variant (i.e which features to *remove* with a certain probability)
+            variant_probabilities = list(self.env.generator.variant_probs.values())
+            indices = torch.bernoulli(torch.tensor(variant_probabilities))
 
             # Process the indices
             if indices[0] == 1:  # Remove open
