@@ -13,8 +13,9 @@ _Towards Foundation Models for Vehicle Routing Problems_
 </div>
 
 
-## 📰 News 
-- Oct 2024: The latest version of RouteFinder has been released! We have added the latest contributions from our preprint and much improved codebase
+## 📰 News
+- Feb 2025: A new version (`v0.3.0`) of RouteFinder has been released. We have added several improvements, among which increasing the number of VRP variants from 24 to 48! See details on the [release notes](https://github.com/ai4co/routefinder/releases/tag/v0.3.0)
+- Oct 2024: A new version (`v0.2.0`) of RouteFinder has been released! We have added the latest contributions from our preprint and much improved codebase
 - Jul 2024: RouteFinder has been accepted as an **Oral** presentatation at the [ICML 2024 FM-Wild Workshop](https://icml-fm-wild.github.io/)!
 
 
@@ -61,8 +62,8 @@ You may change the experiment by using the `experiment=YOUR_EXP`, with the path 
 You may use the provided test function:
 
 ```bash
-python test.py --checkpoint checkpoints/100/rf-transformer.ckpt   
-``` 
+python test.py --checkpoint checkpoints/100/rf-transformer.ckpt
+```
 
 or with additional parameters:
 
@@ -112,18 +113,18 @@ python run_eal.py
 with the following parameters:
 
 ```
-usage: run_eal.py [-h] [--model_type MODEL_TYPE]
-                  [--experiment EXPERIMENT]
-                  [--checkpoint CHECKPOINT]
-                  [--lr LR] [--num_runs NUM_RUNS]
+usage: run_eal.py [-h] [--model_type MODEL_TYPE] [--experiment EXPERIMENT]
+                  [--variants_finetune VARIANTS_FINETUNE]
+                  [--checkpoint CHECKPOINT] [--lr LR] [--num_runs NUM_RUNS]
 
 options:
-  -h, --help            show this help message
-                        and exit
+  -h, --help            show this help message and exit
   --model_type MODEL_TYPE
-                        Model type: rf, mvmoe,
-                        mtpomo
+                        Model type: rf, mvmoe, mtpomo
   --experiment EXPERIMENT
+                        Experiment type
+  --variants_finetune VARIANTS_FINETUNE
+                        Variants to finetune on
   --checkpoint CHECKPOINT
   --lr LR
   --num_runs NUM_RUNS
@@ -140,38 +141,71 @@ with additional parameters that can be found in the [eal.py](eal.py) file.
 </div>
 
 
-We consider 24 variants, which include the base Capacity (C). The $k=4$ features O, B, L, and TW can be combined into any subset, including the empty set and itself (i.e., a *power set*) with $2^k = 16$ possible combinations. Finally, we study the additional Mixed (M) global feature that creates new Backhaul (B) variants in generalization studies, adding 8 more variants.
-
+We consider 48 VRP variants. All variants include the base Capacity (C). The $k=5$ features O, B, L, TW, and MD can be combined into any subset, including the empty set and itself (i.e., a power set with $2^k = 32$ possible combinations. The Mixed (M) global feature creates new Mixed Backhaul (MB) variants in generalization studies, adding 16 more variants.
 We have the following environments available:
 
-| | Capacity<br>(C) | Open Route<br>(O) | Backhaul<br>(B) | Mixed<br>(M) | Duration Limit<br>(L) | Time Windows<br>(TW) |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| CVRP | ✔ | | | | | |
-| OVRP | ✔ | ✔ | | | | |
-| VRPB | ✔ | | ✔ | | | |
-| VRPL | ✔ | | | | ✔ | |
-| VRPTW | ✔ | | | | | ✔ |
-| OVRPTW | ✔ | ✔ | | | | ✔ |
-| OVRPB | ✔ | ✔ | ✔ | | | |
-| OVRPL | ✔ | ✔ | | | ✔ | |
-| VRPBL | ✔ | | ✔ | | ✔ | |
-| VRPBTW | ✔ | | ✔ | | | ✔ |
-| VRPLTW | ✔ | | | | ✔ | ✔ |
-| OVRPBL | ✔ | ✔ | ✔ | | ✔ | |
-| OVRPBTW | ✔ | ✔ | ✔ | | | ✔ |
-| OVRPLTW | ✔ | ✔ | | | ✔ | ✔ |
-| VRPBLTW | ✔ | | ✔ | | ✔ | ✔ |
-| OVRPBLTW | ✔ | ✔ | ✔ | | ✔ | ✔ |
-| VRPMB | ✔ | | ✔ | ✔ | | |
-| OVRPMB | ✔ | ✔ | ✔ | ✔ | | |
-| VRPMBL | ✔ | | ✔ | ✔ | ✔ | |
-| VRPMBTW | ✔ | | ✔ | ✔ | | ✔ |
-| OVRPMBL | ✔ | ✔ | ✔ | ✔ | ✔ | |
-| OVRPMBTW | ✔ | ✔ | ✔ | ✔ | | ✔ |
-| VRPMBLTW | ✔ | | ✔ | ✔ | ✔ | ✔ |
-| OVRPMBLTW | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **VRP Variant**  | **Capacity (C)** | **Open Route (O)** | **Backhaul (B)** | **Mixed (M)** | **Duration Limit (L)** | **Time Windows (TW)** | **Multi-depot (MD)** |
+|------------------|:----------------:|:------------------:|:----------------:|:-------------:|:----------------------:|:---------------------:|:-------------------:|
+| CVRP             | ✔                |                    |                  |               |                        |                       |                     |
+| OVRP             | ✔                | ✔                  |                  |               |                        |                       |                     |
+| VRPB             | ✔                |                    | ✔                |               |                        |                       |                     |
+| VRPL             | ✔                |                    |                  |               | ✔                      |                       |                     |
+| VRPTW            | ✔                |                    |                  |               |                        | ✔                     |                     |
+| OVRPTW           | ✔                | ✔                  |                  |               |                        | ✔                     |                     |
+| OVRPB            | ✔                | ✔                  | ✔                |               |                        |                       |                     |
+| OVRPL            | ✔                | ✔                  |                  |               | ✔                      |                       |                     |
+| VRPBL            | ✔                |                    | ✔                |               | ✔                      |                       |                     |
+| VRPBTW           | ✔                |                    | ✔                |               |                        | ✔                     |                     |
+| VRPLTW           | ✔                |                    |                  |               | ✔                      | ✔                     |                     |
+| OVRPBL           | ✔                | ✔                  | ✔                |               | ✔                      |                       |                     |
+| OVRPBTW          | ✔                | ✔                  | ✔                |               |                        | ✔                     |                     |
+| OVRPLTW          | ✔                | ✔                  |                  |               | ✔                      | ✔                     |                     |
+| VRPBLTW          | ✔                |                    | ✔                |               | ✔                      | ✔                     |                     |
+| OVRPBLTW         | ✔                | ✔                  | ✔                |               | ✔                      | ✔                     |                     |
+| VRPMB            | ✔                |                    | ✔                | ✔             |                        |                       |                     |
+| OVRPMB           | ✔                | ✔                  | ✔                | ✔             |                        |                       |                     |
+| VRPMBL           | ✔                |                    | ✔                | ✔             | ✔                      |                       |                     |
+| VRPMBTW          | ✔                |                    | ✔                | ✔             |                        | ✔                     |                     |
+| OVRPMBL          | ✔                | ✔                  | ✔                | ✔             | ✔                      |                       |                     |
+| OVRPMBTW         | ✔                | ✔                  | ✔                | ✔             |                        | ✔                     |                     |
+| VRPMBLTW         | ✔                |                    | ✔                | ✔             | ✔                      | ✔                     |                     |
+| OVRPMBLTW        | ✔                | ✔                  | ✔                | ✔             | ✔                      | ✔                     |                     |
+| MDCVRP           | ✔                |                    |                  |               |                        |                       | ✔                   |
+| MDOVRP           | ✔                | ✔                  |                  |               |                        |                       | ✔                   |
+| MDVRPB           | ✔                |                    | ✔                |               |                        |                       | ✔                   |
+| MDVRPL           | ✔                |                    |                  |               | ✔                      |                       | ✔                   |
+| MDVRPTW          | ✔                |                    |                  |               |                        | ✔                     | ✔                   |
+| MDOVRPTW         | ✔                | ✔                  |                  |               |                        | ✔                     | ✔                   |
+| MDOVRPB          | ✔                | ✔                  | ✔                |               |                        |                       | ✔                   |
+| MDOVRPL          | ✔                | ✔                  |                  |               | ✔                      |                       | ✔                   |
+| MDVRPBL          | ✔                |                    | ✔                |               | ✔                      |                       | ✔                   |
+| MDVRPBTW         | ✔                |                    | ✔                |               |                        | ✔                     | ✔                   |
+| MDVRPLTW         | ✔                |                    |                  |               | ✔                      | ✔                     | ✔                   |
+| MDOVRPBL         | ✔                | ✔                  | ✔                |               | ✔                      |                       | ✔                   |
+| MDOVRPBTW        | ✔                | ✔                  | ✔                |               |                        | ✔                     | ✔                   |
+| MDOVRPLTW        | ✔                | ✔                  |                  |               | ✔                      | ✔                     | ✔                   |
+| MDVRPBLTW        | ✔                |                    | ✔                |               | ✔                      | ✔                     | ✔                   |
+| MDOVRPBLTW       | ✔                | ✔                  | ✔                |               | ✔                      | ✔                     | ✔                   |
+| MDVRPMB          | ✔                |                    | ✔                | ✔             |                        |                       | ✔                   |
+| MDOVRPMB         | ✔                | ✔                  | ✔                | ✔             |                        |                       | ✔                   |
+| MDVRPMBL         | ✔                |                    | ✔                | ✔             | ✔                      |                       | ✔                   |
+| MDVRPMBTW        | ✔                |                    | ✔                | ✔             |                        | ✔                     | ✔                   |
+| MDOVRPMBL        | ✔                | ✔                  | ✔                | ✔             | ✔                      |                       | ✔                   |
+| MDOVRPMBTW       | ✔                | ✔                  | ✔                | ✔             |                        | ✔                     | ✔                   |
+| MDVRPMBLTW       | ✔                |                    | ✔                | ✔             | ✔                      | ✔                     | ✔                   |
+| MDOVRPMBLTW      | ✔                | ✔                  | ✔                | ✔             | ✔                      | ✔                     | ✔                   |
+
 
 We additionally provide as baseline solvers for all baselines 1) [OR-Tools](https://github.com/google/or-tools) and 2) the SotA [PyVRP](https://github.com/PyVRP/PyVRP).
+
+### A tip for you!
+
+Do you want to improve the performance of your model with no effort? Use our Transformer structure, based on recent models such as Llama and DeepSeek ;)
+
+<div align="center">
+    <img src="assets/rf-te.png" alt="VRP Problems" style="width: 50%; height: auto;">
+</div>
+
 
 
 ### Known Bugs
