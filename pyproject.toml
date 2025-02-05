@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "routefinder"
-version = "0.2.0"
+version = "0.3.0"
 description = "Towards Foundation Models for Vehicle Routing Problems"
 authors = [
     "Federico Berto <berto.federico2@gmail.com>",
@@ -13,6 +13,7 @@ authors = [
     "Andre Hottung",
     "Leon Lan",
     "Niels Wouda",
+    "Junyoung Park",
     "Kevin Tierney",
     "Jinkyoo Park",
 ]
