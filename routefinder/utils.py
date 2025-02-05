@@ -3,6 +3,15 @@ import torch
 from rl4co.utils.ops import gather_by_index, unbatchify
 
 
+# random policy for (pytest) testing
+def random_policy(td):
+    """Select closest available action"""
+    available_actions = td["action_mask"]
+    action = torch.multinomial(available_actions.float(), 1).squeeze()
+    td.set("action", action)
+    return td
+
+
 # Simple heuristics (nearest neighbor + capacity check)
 def greedy_policy(td):
     """Select closest available action"""
@@ -48,6 +57,24 @@ def rollout(env, td, policy=greedy_policy, max_steps: int = None):
             print("Max steps reached")
             break
     return torch.stack(actions, dim=1)
+
+
+def rollout_actions(env, td, actions, max_steps: int = None):
+    """actions: [batch_size, num_steps]"""
+    max_steps = float("inf") if max_steps is None else max_steps
+    steps = 0
+
+    # while not td["done"].all():
+    num_steps = actions.size(1)
+
+    for i in range(num_steps):
+        td.set("action", actions[:, i])
+        td = env.step(td)["next"]
+        steps += 1
+        if steps > max_steps:
+            print("Max steps reached")
+            break
+    return td
 
 
 def evaluate(
