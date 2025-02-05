@@ -2,16 +2,16 @@ import numpy as np
 import pyvrp as pyvrp
 
 from pyvrp import Client, Depot, ProblemData, VehicleType, solve as _solve
-from pyvrp.constants import MAX_VALUE
 from pyvrp.stop import MaxRuntime
 from tensordict.tensordict import TensorDict
 from torch import Tensor
 
-from .constants import PYVRP_SCALING_FACTOR
 from .utils import scale
 
-# TODO: check. This works for now
-MAX_VALUE = 1 << 42  # noqa: F811
+PYVRP_SCALING_FACTOR = 1_000
+
+# NOTE: no idea why, it still got stuck somehow, so lowered it to 1 << 32
+PYVRP_MAX_VALUE = 1 << 32  # noqa: F811
 
 
 def solve(instance: TensorDict, max_runtime: float, **kwargs) -> tuple[Tensor, Tensor]:
@@ -55,15 +55,22 @@ def instance2data(instance: TensorDict, scaling_factor: int) -> ProblemData:
     ProblemData
         The ProblemData instance.
     """
-    num_locs = instance["demand_backhaul"].size()[0]
+    num_locs = instance["locs"].size()[0]
+    num_depots = instance["num_depots"]
+    num_clients = num_locs - num_depots
 
-    time_windows = scale(instance["time_windows"], scaling_factor)
-    pickup = scale(instance["demand_backhaul"], scaling_factor)
-    delivery = scale(instance["demand_linehaul"], scaling_factor)
-    service = scale(instance["durations"], scaling_factor)
-    capacity = scale(instance["vehicle_capacity"], scaling_factor)
-    max_distance = scale(instance["distance_limit"], scaling_factor)
-    matrix = scale(instance["cost_matrix"], scaling_factor)
+    time_windows = scale(instance["time_windows"], scaling_factor)  # num_locs
+    pickup = scale(instance["demand_backhaul"], scaling_factor)  # num_clients
+    delivery = scale(instance["demand_linehaul"], scaling_factor)  # num_clients
+    service = scale(instance["durations"], scaling_factor)  # num_locs
+    capacity = scale(instance["vehicle_capacity"], scaling_factor)  # 1
+    max_distance = scale(instance["distance_limit"], scaling_factor)  # 1
+    matrix = scale(instance["cost_matrix"], scaling_factor)  # num_locs
+
+    # Some checks that the depot values are zero.
+    assert np.all(delivery[:num_depots] == 0)
+    assert np.all(pickup[:num_depots] == 0)
+
     # If locs is not provided, simply use zeros
     # They are not needed since the cost matrix is used instead
     if "locs" in instance:
@@ -71,36 +78,37 @@ def instance2data(instance: TensorDict, scaling_factor: int) -> ProblemData:
     else:
         coords = np.zeros((num_locs, 2))
 
-    depot = Depot(
-        x=coords[0][0],
-        y=coords[0][1],
-    )
-
+    depots = [Depot(x=coords[idx][0], y=coords[idx][1]) for idx in range(num_depots)]
     clients = [
         Client(
             x=coords[idx][0],
             y=coords[idx][1],
             tw_early=time_windows[idx][0],
             tw_late=time_windows[idx][1],
-            delivery=delivery[idx],
-            pickup=pickup[idx],
+            delivery=delivery[idx],  # client idx
+            pickup=pickup[idx],  # client idx
             service_duration=service[idx],
         )
-        for idx in range(1, num_locs)
+        for idx in range(num_depots, num_locs)
     ]
 
-    vehicle_type = VehicleType(
-        num_available=num_locs - 1,  # one vehicle per client
-        capacity=capacity,
-        max_distance=max_distance,
-        tw_early=time_windows[0][0],
-        tw_late=time_windows[0][1],
-    )
+    vehicle_types = [
+        VehicleType(
+            num_available=num_clients,  # one vehicle per client
+            capacity=capacity,
+            max_distance=max_distance,
+            tw_early=time_windows[depot_idx][0],
+            tw_late=time_windows[depot_idx][1],
+            start_depot=depot_idx,
+            end_depot=depot_idx,
+        )
+        for depot_idx in range(num_depots)
+    ]
 
     if instance["open_route"]:
-        # Vehicles do not need to return to the depot, so we set all arcs
-        # to the depot to zero.
-        matrix[:, 0] = 0
+        # Vehicles do not need to return to the depots, so we set all arcs
+        # to the depots to zero.
+        matrix[:, :num_depots] = 0
 
     if instance["backhaul_class"] == 1:  # VRP with backhauls
         # In VRPB, linehauls must be served before backhauls. This can be
@@ -109,16 +117,24 @@ def instance2data(instance: TensorDict, scaling_factor: int) -> ProblemData:
         # from backhaul to linehaul (avoiding linehaul after backhaul clients).
         linehaul = np.flatnonzero(delivery > 0)
         backhaul = np.flatnonzero(pickup > 0)
+        matrix[np.ix_(backhaul, linehaul)] = PYVRP_MAX_VALUE
+
         # Note: we remove the constraint that we cannot visit backhauls *only* in a
         # a single route as per Slack discussion
         # matrix[0, backhaul] = MAX_VALUE
-        matrix[np.ix_(backhaul, linehaul)] = MAX_VALUE
 
-    return ProblemData(clients, [depot], [vehicle_type], [matrix], [matrix])
+    return ProblemData(clients, depots, vehicle_types, [matrix], [matrix])
 
 
 def solution2action(solution: pyvrp.Solution) -> list[int]:
     """
     Converts a PyVRP solution to the action representation, i.e., a giant tour.
+    Each route is represented by the location indices visited, including the
+    start depot but excluding the end depot.
     """
-    return [visit for route in solution.routes() for visit in route.visits() + [0]]
+    action = []
+    for route in solution.routes():
+        action.append(route.start_depot())
+        action.extend(route.visits())
+
+    return action
