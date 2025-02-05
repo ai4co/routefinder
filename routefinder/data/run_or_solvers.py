@@ -13,7 +13,7 @@ from tensordict import TensorDict
 from tqdm.auto import tqdm
 
 from routefinder.baselines.solve import solve
-from routefinder.envs.mtvrp import MTVRPEnv
+from routefinder.envs.mtdvrp import MTVRPEnv
 
 # Size to solving time as in paper (seconds)
 size_to_time = {
