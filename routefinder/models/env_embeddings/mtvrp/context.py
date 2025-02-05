@@ -142,3 +142,36 @@ class MTVRPContextEmbeddingM(MTVRPContextEmbeddingRouteFinder):
             ),
             -1,
         )
+
+
+class MTVRPContextEmbeddingFull(MTVRPContextEmbeddingRouteFinder):
+    """Context embedding MTVRP with full features, including the Mixed Backhaul (MB) variants
+    and Multi-depot (MD) variants as well.
+    In practice, we use the same features as the MTVRPContextEmbeddingRouteFinder, but we add:
+    - available load for MB variants (backhaul class 2)
+    - locations of the depot where we started the route, since we may need to return there
+    """
+
+    def __init__(self, embed_dim=128, default_remain_dist=10):
+        EnvContext.__init__(self, embed_dim=embed_dim, step_context_dim=embed_dim + 4 + 2)
+        self.default_remain_dist = default_remain_dist
+
+    def _state_embedding(self, embeddings, td):
+        context_feats = super(MTVRPContextEmbeddingFull, self)._state_embedding(
+            embeddings, td
+        )
+        # this will be 0 and tell the model we are *not* doing VRPMPD if backhaul class is not 2
+        available_load_vrpmpd = (
+            td["vehicle_capacity"] - td["used_capacity_backhaul"]
+        ) * (td["backhaul_class"] == 2)
+
+        start_depot_location = gather_by_index(td["locs"], td["current_depot"], dim=-2)
+
+        return torch.cat(
+            (
+                context_feats,
+                available_load_vrpmpd,
+                start_depot_location,
+            ),
+            -1,
+        )

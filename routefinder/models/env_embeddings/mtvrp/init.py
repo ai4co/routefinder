@@ -19,16 +19,16 @@ class MTVRPInitEmbedding(nn.Module):
     """
 
     def __init__(
-        self, embed_dim=128, bias=False, **kw
+        self, embed_dim=128, bias=False, num_global_feats=2, num_cust_feats=7, **kw
     ):  # node: linear bias should be false in order not to influence the embedding if
         super(MTVRPInitEmbedding, self).__init__()
 
         # Depot feats (includes global features): x, y, distance, backhaul_class, open_route
-        global_feat_dim = 2
+        global_feat_dim = num_global_feats
         self.project_global_feats = nn.Linear(global_feat_dim, embed_dim, bias=bias)
 
         # Customer feats: x, y, demand_linehaul, demand_backhaul, time_window_early, time_window_late, durations
-        customer_feat_dim = 7
+        customer_feat_dim = num_cust_feats
         self.project_customers_feats = nn.Linear(customer_feat_dim, embed_dim, bias=bias)
 
         self.embed_dim = embed_dim
@@ -40,6 +40,7 @@ class MTVRPInitEmbedding(nn.Module):
         # Customers (batch, N, 5) -> (batch, N, embed_dim)
         # note that these feats include the depot (but unused) so we exclude the first node
         cust_feats = torch.cat(
+            # TODO replace 1 with actual number of depots
             (
                 td["demand_linehaul"][..., 1:, None],
                 td["demand_backhaul"][..., 1:, None],
@@ -133,6 +134,7 @@ class MTVRPInitEmbeddingRouteFinder(MTVRPInitEmbeddingRouteFinderBase):
         return torch.cat(
             [
                 td["open_route"].float()[..., None],
+                # TODO replace 1 with num_depots
                 td["locs"][:, :1, :],
                 td["distance_limit"][..., None],
                 td["time_windows"][:, :1, 1:2],
@@ -169,3 +171,63 @@ class MTVRPInitEmbeddingM(MTVRPInitEmbeddingRouteFinder):
         glob_feats = super(MTVRPInitEmbeddingM, self)._global_feats(td)
         is_mixed_backhaul = (td["backhaul_class"] == 2).float()
         return torch.cat([glob_feats, is_mixed_backhaul[..., None]], -1)
+
+
+class MTVRPInitEmbeddingFull(MTVRPInitEmbeddingRouteFinder):
+    """
+    This is the full embedding, including the Mixed Backhaul (MB) variants
+    and Multi-depot (MD) variants as well.
+    Node features:
+        Customer features:
+            - locs: x, y euclidean coordinates
+            - demand_linehaul: demand of the nodes (delivery) (C)
+            - demand_backhaul: demand of the nodes (pickup) (B)
+            - time_windows: time window (TW)
+            - service_time: service time of the nodes
+        Depot features:
+            - (end) time window of depots
+            - x, y euclidean coordinates of depots (MD, optional)
+    Global features:
+        - open_route (O)
+        - distance_limit (L)
+        - backhaul_class (MB)
+    This allows the network to learn the relationships between them.
+    Note that the global features in practice are embedded in the depots, since
+    they represent vehicle characteristics.
+    """
+
+    def __init__(self, embed_dim=128, bias=False, posinf_val=0.0):
+        super(MTVRPInitEmbeddingRouteFinder, self).__init__(
+            num_global_feats=6,  # x, y, open_route, distance_limit, time_window_depot, backhaul_class
+            num_cust_feats=7,
+            embed_dim=embed_dim,
+            bias=bias,
+            posinf_val=posinf_val,
+        )
+
+    def _global_feats(self, td):
+        """Global features include the depot node(s) features"""
+        num_depots = td["num_depots"].max().item()
+        return torch.cat(
+            [
+                td["open_route"].float()[..., None].repeat(1, num_depots, 1),
+                td["locs"][:, :num_depots, :],
+                td["distance_limit"][..., None].repeat(1, num_depots, 1),
+                td["time_windows"][:, :num_depots, 1:2],
+                (td["backhaul_class"] == 2).float()[..., None].repeat(1, num_depots, 1),
+            ],
+            -1,
+        )
+
+    def _cust_feats(self, td):
+        num_depots = td["num_depots"].max().item()
+        return torch.cat(
+            (
+                td["locs"][..., num_depots:, :],
+                td["demand_linehaul"][..., num_depots:, None],
+                td["demand_backhaul"][..., num_depots:, None],
+                td["time_windows"][..., num_depots:, :],
+                td["service_time"][..., num_depots:, None],
+            ),
+            -1,
+        )
