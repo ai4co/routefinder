@@ -58,10 +58,19 @@ def generate_mtvrp_data(
     max_time=4.6,
     max_distance_limit=2.8,  # 2sqrt(2) ~= 2.8
     speed=1.0,
+    num_depots=3,  # number of depots, only used for multi-depot problems
     variant="CVRP",
 ):
-    """Generate MTVRP data using NumPy for a specific variant."""
-
+    """Generate MTVRP data using NumPy for a specific variant.
+    NOTE: for MD (multi-depot) variants, we generate in the same way
+    as single depot (considering the first one), but set the number of depots to the desired value.
+    """
+    # if first two letters are "md", strip and set multi-depot flag
+    if variant[:2].lower() == "md":
+        variant = variant[2:]
+        num_depots = num_depots
+    else:
+        num_depots = 1  # single depot
     variant = variant.upper()
     if variant not in VARIANT_FEATURES:
         raise ValueError(f"Unknown variant: {variant}")
@@ -72,7 +81,7 @@ def generate_mtvrp_data(
         capacity = get_vehicle_capacity(num_loc)
 
     # Generate locations
-    locs = np.random.uniform(min_loc, max_loc, (dataset_size, num_loc + 1, 2))
+    locs = np.random.uniform(min_loc, max_loc, (dataset_size, num_depots + num_loc, 2))
 
     # Generate demands
     def generate_demand(size):
@@ -107,7 +116,8 @@ def generate_mtvrp_data(
         a, b, c = 0.15, 0.18, 0.2
         service_time = a + (b - a) * np.random.rand(dataset_size, num_loc)
         tw_length = b + (c - b) * np.random.rand(dataset_size, num_loc)
-        d_0i = np.linalg.norm(locs[:, 0:1] - locs[:, 1:], axis=2)
+        # note: we assume that the first depot only for this
+        d_0i = np.linalg.norm(locs[:, 0:1] - locs[:, num_depots:], axis=2)
         h_max = (max_time - service_time - tw_length) / d_0i * speed - 1
         tw_start = (
             (1 + (h_max - 1) * np.random.rand(dataset_size, num_loc)) * d_0i / speed
@@ -115,11 +125,15 @@ def generate_mtvrp_data(
         tw_end = tw_start + tw_length
 
         time_windows = np.concatenate(
-            [np.zeros((dataset_size, 1, 2)), np.stack([tw_start, tw_end], axis=-1)],
+            [
+                np.zeros((dataset_size, num_depots, 2)),
+                np.stack([tw_start, tw_end], axis=-1),
+            ],
             axis=1,
         )
-        time_windows[:, 0, 1] = max_time
-        service_time = np.pad(service_time, ((0, 0), (1, 0)))
+        time_windows[:, :num_depots, 1] = max_time
+        # pad service time until the number of depots
+        service_time = np.pad(service_time, ((0, 0), (num_depots, 0)))
 
     # Generate distance limits: dist_lower_bound = 2 * max(depot_to_location_distance),
     # max = min(dist_lower_bound, max_distance_limit). Ensures feasible yet challenging
@@ -160,6 +174,7 @@ def generate_mtvrp_data(
         "demand_linehaul": demand_linehaul.astype(np.float32),
         "vehicle_capacity": vehicle_capacity.astype(np.float32),
         "speed": speed.astype(np.float32),
+        "num_depots": np.full((dataset_size, 1), num_depots).astype(np.int32),
     }
 
     # Only include features that are used in the variant
