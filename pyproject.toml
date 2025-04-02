@@ -1,34 +1,36 @@
 [build-system]
-requires = ["poetry"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = "routefinder"
-version = "0.3.0"
+version = "0.3.1"
 description = "Towards Foundation Models for Vehicle Routing Problems"
 authors = [
-    "Federico Berto <berto.federico2@gmail.com>",
-    "Chuanbo Hua <cbhua@kaist.ac.kr>",
-    "Nayeli Gast Zepeda <nayeli.gast@uni-bielefeld.de>",
-    "Andre Hottung",
-    "Leon Lan",
-    "Niels Wouda",
-    "Junyoung Park",
-    "Kevin Tierney",
-    "Jinkyoo Park",
+    { name = "Federico Berto", email = "berto.federico2@gmail.com" },
+    { name = "Chuanbo Hua", email = "cbhua@kaist.ac.kr" },
+    { name = "Nayeli Gast Zepeda", email = "nayeli.gast@uni-bielefeld.de" },
+    { name = "Andre Hottung" },
+    { name = "Leon Lan" },
+    { name = "Niels Wouda" },
+    { name = "Junyoung Park" },
+    { name = "Kevin Tierney" },
+    { name = "Jinkyoo Park" },
 ]
+requires-python = ">=3.10"
 readme = "README.md"
 license = "MIT"
+dependencies = ["rl4co"]
 
-[tool.poetry.dependencies]
-python = ">=3.9"
-rl4co = { git = "https://github.com/ai4co/rl4co.git", branch = "main", extras = ["dev"] }
-pyvrp = { version = "^0.9.1", optional = true }
-ortools = { version = "^9.10.4067", optional = true }
+[project.optional-dependencies]
+dev = ["black>=24.0.0", "pre-commit>=3.0.0", "ruff>=0.5.0", "pytest>=7.0.0", "pip>=23.0.0", "ipykernel>=6.0.0"]
+solver = [
+    "pyvrp>=0.9.1,<0.10",
+    "ortools>=9.10.4067,<10",
+]
 
-[tool.poetry.extras]
-dev = ["pytest", "pytest-cov", "black", "ruff", "pre-commit"]
-solver = ["pyvrp", "ortools"]
+[tool.uv.sources]
+rl4co = { git = "https://github.com/ai4co/rl4co.git", branch = "main" }
 
 [tool.ruff]
 select = ["F", "E", "W", "I001"]

@@ -21,6 +21,24 @@ _Towards Foundation Models for Vehicle Routing Problems_
 
 ## 🚀 Installation
 
+We recommend setting the project up with [UV](https://github.com/astral-sh/uv) (Python package manager) `curl -LsSf https://astral.sh/uv/install.sh | sh`:
+
+Create a new virtual environment and activate it:
+```bash
+uv venv --python 3.12
+source .venv/bin/activate
+```
+
+Then synchronize the dependencies (can also specify extras as `dev` and `solver`):
+
+```bash
+uv sync --all-extras
+```
+
+<details>
+<summary>Install with pip</summary>
+If you prefer to use `pip`, you can install the dependencies using the following command:
+
 Install the package in editable mode:
 
 ```bash
@@ -28,7 +46,7 @@ pip install -e .
 ```
 
 If you would like to install all dependencies including optional solvers, please install using `pip install -e '.[dev,solver]'`
-
+</details>
 
 ## 🏁 Quickstart
 
@@ -59,7 +77,16 @@ You may change the experiment by using the `experiment=YOUR_EXP`, with the path 
 
 ### Testing
 
-You may use the provided test function:
+First, generate the test data by running:
+
+```bash
+python generate_data.py
+```
+
+(Note that gaps are calculated with provided solutions from PyVRP under the `data/` directory).
+
+
+You may use the provided test function to test the model:
 
 ```bash
 python test.py --checkpoint checkpoints/100/rf-transformer.ckpt
@@ -131,6 +158,13 @@ options:
 ```
 
 with additional parameters that can be found in the [eal.py](eal.py) file.
+
+### Development
+
+To test automatically if the code works, you can run:
+```bash
+python -m pytest tests/*
+```
 
 
 

@@ -173,3 +173,6 @@ local_nbrun*
 # osx meta files
 .DS_Store
 outputs/
+
+# uv
+uv.lock
