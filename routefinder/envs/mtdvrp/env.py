@@ -10,12 +10,7 @@ from rl4co.envs.common.base import RL4COEnvBase
 from rl4co.utils.ops import gather_by_index, get_distance
 from rl4co.utils.pylogger import get_pylogger
 from tensordict.tensordict import TensorDict
-from torchrl.data import (
-    BoundedTensorSpec,
-    CompositeSpec,
-    UnboundedContinuousTensorSpec,
-    UnboundedDiscreteTensorSpec,
-)
+from torchrl.data import Bounded, Composite, UnboundedContinuous, UnboundedDiscrete
 
 from routefinder.utils import rollout_actions
 
@@ -615,51 +610,51 @@ class MTVRPEnv(RL4COEnvBase):
     def _make_spec(self, td_params: TensorDict):
         # TODO: include extra vars (but we don't really need them for now)
         """Make the observation and action specs from the parameters."""
-        self.observation_spec = CompositeSpec(
-            locs=BoundedTensorSpec(
+        self.observation_spec = Composite(
+            locs=Bounded(
                 low=self.generator.min_loc,
                 high=self.generator.max_loc,
                 shape=(self.generator.num_loc + 1, 2),
                 dtype=torch.float32,
                 device=self.device,
             ),
-            current_node=UnboundedDiscreteTensorSpec(
+            current_node=UnboundedDiscrete(
                 shape=(1),
                 dtype=torch.int64,
                 device=self.device,
             ),
-            demand_linehaul=BoundedTensorSpec(
+            demand_linehaul=Bounded(
                 low=-self.generator.capacity,
                 high=self.generator.max_demand,
                 shape=(self.generator.num_loc, 1),  # demand is only for customers
                 dtype=torch.float32,
                 device=self.device,
             ),
-            demand_backhaul=BoundedTensorSpec(
+            demand_backhaul=Bounded(
                 low=-self.generator.capacity,
                 high=self.generator.max_demand,
                 shape=(self.generator.num_loc, 1),  # demand is only for customers
                 dtype=torch.float32,
                 device=self.device,
             ),
-            action_mask=UnboundedDiscreteTensorSpec(
+            action_mask=UnboundedDiscrete(
                 shape=(self.generator.num_loc + 1, 1),
                 dtype=torch.bool,
                 device=self.device,
             ),
             shape=(),
         )
-        self.action_spec = BoundedTensorSpec(
+        self.action_spec = Bounded(
             low=0,
             high=self.generator.num_loc + 1,
             shape=(1,),
             dtype=torch.int64,
             device=self.device,
         )
-        self.reward_spec = UnboundedContinuousTensorSpec(
+        self.reward_spec = UnboundedContinuous(
             shape=(1,), dtype=torch.float32, device=self.device
         )
-        self.done_spec = UnboundedDiscreteTensorSpec(
+        self.done_spec = UnboundedDiscrete(
             shape=(1,), dtype=torch.bool, device=self.device
         )
 
