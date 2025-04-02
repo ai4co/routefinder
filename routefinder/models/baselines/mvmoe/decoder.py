@@ -1,5 +1,7 @@
 import math
 
+from typing import Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,8 +11,9 @@ from rl4co.models.nn.attention import PointerAttention
 
 # from rl4co.models.nn.env_embeddings import env_context_embedding, env_dynamic_embedding
 from rl4co.models.nn.env_embeddings.dynamic import StaticEmbedding
-from rl4co.models.zoo.am.decoder import AttentionModelDecoder
+from rl4co.models.zoo.am.decoder import AttentionModelDecoder, PrecomputedCache
 from rl4co.utils.pylogger import get_pylogger
+from tensordict import TensorDict
 from torch.nn.functional import scaled_dot_product_attention
 
 from routefinder.models.env_embeddings.mtvrp.context import MTVRPContextEmbedding
@@ -70,6 +73,7 @@ class PointerAttentionMoE(PointerAttention):
 
         else:
             self.project_out = nn.Linear(embed_dim, embed_dim, bias=out_bias)
+        self.moe_loss = 0  # init to 0
 
     def forward(self, query, key, value, logit_key, attn_mask=None):
         # Compute inner multi-head attention with no projections.
@@ -119,8 +123,9 @@ class PointerAttentionMoE(PointerAttention):
         if self.check_nan:
             assert not torch.isnan(logits).any(), "Logits contain NaNs"
 
-        # moe loss gets saved in module
-        self.moe_loss = moe_loss
+        # MoE loss is saved in the module
+        # Note that this is re-initialized by the `pre_decoder_hook` of the decoder
+        self.moe_loss += moe_loss
         return logits
 
 
@@ -197,3 +202,11 @@ class MVMoEDecoder(AttentionModelDecoder):
             topk=topk,
             hierarchical_gating=hierarchical_gating,
         )
+
+    def pre_decoder_hook(
+        self, td, env, embeddings, num_starts: int = 0
+    ) -> Tuple[TensorDict, RL4COEnvBase, PrecomputedCache]:
+        """Precompute the embeddings cache before the decoder is called"""
+        # Re-intialize the moe loss in the pointer
+        self.pointer.moe_loss = 0
+        return td, env, self._precompute_cache(embeddings, num_starts=num_starts)
