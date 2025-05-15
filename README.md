@@ -1,7 +1,8 @@
 # RouteFinder
 
 [![arXiv](https://img.shields.io/badge/arXiv-2406.15007-b31b1b.svg)](https://arxiv.org/abs/2406.15007) [![OpenReview](https://img.shields.io/badge/⚖️-OpenReview-8b1b16)](https://openreview.net/forum?id=hCiaiZ6e4G) [![Slack](https://img.shields.io/badge/slack-chat-611f69.svg?logo=slack)](https://join.slack.com/t/rl4co/shared_invite/zt-1ytz2c1v4-0IkQ8NQH4TRXIX8PrRmDhQ)
-[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)[![Test](https://github.com/ai4co/routefinder/actions/workflows/tests.yml/badge.svg)](https://github.com/ai4co/routefinder/actions/workflows/tests.yml)<a href="https://colab.research.google.com/github/ai4co/routefinder/blob/main/examples/1.quickstart.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)[![Test](https://github.com/ai4co/routefinder/actions/workflows/tests.yml/badge.svg)](https://github.com/ai4co/routefinder/actions/workflows/tests.yml)<a href="https://colab.research.google.com/github/ai4co/routefinder/blob/main/examples/1.quickstart.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>[![HuggingFace Dataset](https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow)](https://huggingface.co/ai4co/routefinder)
+[![HuggingFace Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow)](https://huggingface.co/datasets/ai4co/routefinder)
 
 _Towards Foundation Models for Vehicle Routing Problems_
 
@@ -21,32 +22,15 @@ _Towards Foundation Models for Vehicle Routing Problems_
 
 ## 🚀 Installation
 
-We recommend setting the project up with [UV](https://github.com/astral-sh/uv) (Python package manager) `curl -LsSf https://astral.sh/uv/install.sh | sh`:
-
-Create a new virtual environment and activate it:
-```bash
-uv venv --python 3.12
-source .venv/bin/activate
-```
-
-Then synchronize the dependencies (can also specify extras as `dev` and `solver`):
+We use [uv](https://github.com/astral-sh/uv) (Python package manager) to manage the dependencies:
 
 ```bash
-uv sync --all-extras
+uv venv --python 3.12 # create a new virtual environment
+source .venv/bin/activate # activate the virtual environment
+uv sync --all-extras # for all dependencies
 ```
 
-<details>
-<summary>Install with pip</summary>
-If you prefer to use `pip`, you can install the dependencies using the following command:
-
-Install the package in editable mode:
-
-```bash
-pip install -e .
-```
-
-If you would like to install all dependencies including optional solvers, please install using `pip install -e '.[dev,solver]'`
-</details>
+Note that this project is also compatible with normal `pip install -e .` in case you use a different package manager.
 
 ## 🏁 Quickstart
 
@@ -73,6 +57,11 @@ python run.py experiment=main/rf/rf-transformer-100
 ```
 You may change the experiment by using the `experiment=YOUR_EXP`, with the path under [`configs/experiment`](configs/experiment) directory.
 
+To download the data and checkpoints from HuggingFace automatically, you can use:
+
+```bash
+python scripts/download_hf.py
+```
 
 
 ### Testing
@@ -113,6 +102,12 @@ options:
 
 
 We also have a notebook to automatically download and test models on the CVRPLIB [here](examples/2.eval-cvrplib.ipynb)!
+
+### Other scripts
+
+- Data generation: We also include scripts to re-generate data manually (reproducible via random seeds) with `python scripts/generate_data.py`.
+
+- Classical baselines (OR-Tools and HGS-PyVRP): We additionally include a script to solve the problems using classical baselines with e.g. `python scripts/run_or_solvers.py --num_procs 20 --solver pyvrp` to run PyVRP with 20 processes on all the dataset.
 
 
 ## 🔁 Reproducing Experiments
