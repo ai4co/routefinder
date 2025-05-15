@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "routefinder"
-version = "0.3.1"
+version = "0.3.2"
 description = "Towards Foundation Models for Vehicle Routing Problems"
 authors = [
     { name = "Federico Berto", email = "berto.federico2@gmail.com" },
@@ -20,10 +20,21 @@ authors = [
 requires-python = ">=3.10"
 readme = "README.md"
 license = "MIT"
-dependencies = ["rl4co"]
+dependencies = [
+    "huggingface-hub[cli]>=0.31.2",
+    "rl4co",
+]
 
 [project.optional-dependencies]
-dev = ["black>=24.0.0", "pre-commit>=3.0.0", "ruff>=0.5.0", "pytest>=7.0.0", "pip>=23.0.0", "ipykernel>=6.0.0"]
+dev = [
+ "black>=24.0.0",
+ "pre-commit>=3.0.0",
+ "ruff>=0.5.0",
+ "pytest>=7.0.0",
+ "pip>=23.0.0",
+ "ipykernel>=6.0.0",
+ "pytest-xdist>=3.6.1",
+]
 solver = [
     "pyvrp>=0.9.1,<0.10",
     "ortools>=9.10.4067,<10",
@@ -83,4 +94,9 @@ exclude_lines = [
     # Lines to exclude from coverage report (e.g., comments, debug statements)
     "pragma: no cover",
     "if __name__ == .__main__.:",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-xdist>=3.6.1",
 ]
