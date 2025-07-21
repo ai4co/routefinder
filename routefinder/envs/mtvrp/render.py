@@ -7,18 +7,25 @@ log = get_pylogger(__name__)
 
 
 def render(
-    td: TensorDict, actions=None, ax=None, scale_xy: bool = True, vehicle_capacity=None
+    td: TensorDict,
+    actions=None,
+    ax=None,
+    scale_xy: bool = True,
+    vehicle_capacity=None,
+    fontsize: int = 10,
+    return_ax: bool = False,
 ):
     import matplotlib.pyplot as plt
     import numpy as np
 
-    from matplotlib import cm, colormaps
+    from matplotlib import cm
+    from matplotlib.colors import ListedColormap
 
-    num_routine = (actions == 0).sum().item() + 2
-    base = colormaps["nipy_spectral"]
-    color_list = base(np.linspace(0, 1, num_routine))
-    cmap_name = base.name + str(num_routine)
-    out = base.from_list(cmap_name, color_list, num_routine)
+    route_starts = (actions[:-1] == 0) & (actions[1:] != 0)
+    num_routes = route_starts.sum().item()
+    cmap = cm.get_cmap("turbo")
+    color_list = [cmap(x) for x in np.linspace(0.05, 0.95, num_routes)]
+    out = ListedColormap(color_list)
 
     if ax is None:
         _, ax = plt.subplots(dpi=100, figsize=(6, 6))
@@ -82,7 +89,7 @@ def render(
                 f"{delivery.item()}",
                 horizontalalignment="center",
                 verticalalignment="bottom",
-                fontsize=10,
+                fontsize=fontsize,
                 color=cm.Set2(0),
             )
             # scatter delivery as downward triangle
@@ -103,7 +110,7 @@ def render(
                 f"{pickup.item()}",
                 horizontalalignment="center",
                 verticalalignment="top",
-                fontsize=10,
+                fontsize=fontsize,
                 color=cm.Set2(1),
             )
             ax.scatter(
@@ -158,4 +165,8 @@ def render(
     # Remove the ticks
     ax.set_xticks([])
     ax.set_yticks([])
-    plt.show()
+
+    if return_ax:
+        return ax
+    else:
+        plt.show()
