@@ -1,6 +1,6 @@
 # RouteFinder
 
-[![arXiv](https://img.shields.io/badge/arXiv-2406.15007-b31b1b.svg)](https://arxiv.org/abs/2406.15007) [![OpenReview](https://img.shields.io/badge/⚖️-OpenReview-8b1b16)](https://openreview.net/forum?id=hCiaiZ6e4G) [![Slack](https://img.shields.io/badge/slack-chat-611f69.svg?logo=slack)](https://join.slack.com/t/rl4co/shared_invite/zt-1ytz2c1v4-0IkQ8NQH4TRXIX8PrRmDhQ)
+[![arXiv](https://img.shields.io/badge/arXiv-2406.15007-b31b1b.svg)](https://arxiv.org/abs/2406.15007) [![OpenReview](https://img.shields.io/badge/⚖️-OpenReview-8b1b16)](https://openreview.net/forum?id=QzGLoaOPiY) [![Slack](https://img.shields.io/badge/slack-chat-611f69.svg?logo=slack)](https://join.slack.com/t/rl4co/shared_invite/zt-1ytz2c1v4-0IkQ8NQH4TRXIX8PrRmDhQ)
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)[![Test](https://github.com/ai4co/routefinder/actions/workflows/tests.yml/badge.svg)](https://github.com/ai4co/routefinder/actions/workflows/tests.yml)<a href="https://colab.research.google.com/github/ai4co/routefinder/blob/main/examples/1.quickstart.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>[![HuggingFace Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow)](https://huggingface.co/ai4co/routefinder)[![HuggingFace Dataset](https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow)](https://huggingface.co/datasets/ai4co/routefinder)
 
 _Towards Foundation Models for Vehicle Routing Problems_
@@ -14,6 +14,7 @@ _Towards Foundation Models for Vehicle Routing Problems_
 
 
 ## 📰 News
+- Sep 2025: A new version (`v0.4.0`) has been released. We have now added better installation instructions, released models and dataset on HugginFace, and more. Also, we are delighted to announce that RouteFinder has been accepted at TMLR 2025! See details on the [release notes](https://github.com/ai4co/routefinder/releases/tag/v0.4.0)
 - Feb 2025: A new version (`v0.3.0`) of RouteFinder has been released. We have added several improvements, among which increasing the number of VRP variants from 24 to 48! See details on the [release notes](https://github.com/ai4co/routefinder/releases/tag/v0.3.0)
 - Oct 2024: A new version (`v0.2.0`) of RouteFinder has been released! We have added the latest contributions from our preprint and much improved codebase
 - Jul 2024: RouteFinder has been accepted as an **Oral** presentatation at the [ICML 2024 FM-Wild Workshop](https://icml-fm-wild.github.io/)!
@@ -237,13 +238,14 @@ Do you want to improve the performance of your model with no effort? Use our Tra
 If you find RouteFinder valuable for your research or applied projects:
 
 ```
-@inproceedings{berto2024routefinder,
-    title={{RouteFinder}: Towards Foundation Models for Vehicle Routing Problems},
-    author={Berto, Federico and Hua, Chuanbo and Zepeda, Nayeli Gast and Hottung, Andr{\'e} and Wouda, Niels and Lan, Leon and Tierney, Kevin and Park, Jinkyoo},
-    booktitle={ICML 2024 Workshop on Foundation Models in the Wild (Oral)},
-    year={2024},
-    url={https://openreview.net/forum?id=hCiaiZ6e4G},
-    note={\url{https://github.com/ai4co/routefinder}}
+@article{
+    berto2025routefinder,
+    title={{RouteFinder: Towards Foundation Models for Vehicle Routing Problems}},
+    author={Federico Berto and Chuanbo Hua and Nayeli Gast Zepeda and Andr{\'e} Hottung and Niels Wouda and Leon Lan and Junyoung Park and Kevin Tierney and Jinkyoo Park},
+    journal={Transactions on Machine Learning Research},
+    issn={2835-8856},
+    year={2025},
+    url={https://openreview.net/forum?id=QzGLoaOPiY},
 }
 ```
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "routefinder"
-version = "0.3.2"
+version = "0.4.0"
 description = "Towards Foundation Models for Vehicle Routing Problems"
 authors = [
     { name = "Federico Berto", email = "berto.federico2@gmail.com" },
