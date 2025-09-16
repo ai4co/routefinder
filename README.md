@@ -239,13 +239,13 @@ If you find RouteFinder valuable for your research or applied projects:
 
 ```
 @article{
-    berto2025routefinder,
-    title={{RouteFinder: Towards Foundation Models for Vehicle Routing Problems}},
-    author={Federico Berto and Chuanbo Hua and Nayeli Gast Zepeda and Andr{\'e} Hottung and Niels Wouda and Leon Lan and Junyoung Park and Kevin Tierney and Jinkyoo Park},
-    journal={Transactions on Machine Learning Research},
-    issn={2835-8856},
-    year={2025},
-    url={https://openreview.net/forum?id=QzGLoaOPiY},
+berto2025routefinder,
+title={{RouteFinder: Towards Foundation Models for Vehicle Routing Problems}},
+author={Federico Berto and Chuanbo Hua and Nayeli Gast Zepeda and Andr{\'e} Hottung and Niels Wouda and Leon Lan and Junyoung Park and Kevin Tierney and Jinkyoo Park},
+journal={Transactions on Machine Learning Research},
+issn={2835-8856},
+year={2025},
+url={https://openreview.net/forum?id=QzGLoaOPiY},
 }
 ```
 
